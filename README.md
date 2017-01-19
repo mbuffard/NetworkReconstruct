@@ -41,4 +41,5 @@ Code files
   load the lists of identified proteins and perform enrichment tests (fisher)
   It can also rank the pathways according to pvalue and select the ones to build a network
 * syk_datasets.py: define input and output and calls code from rank_pathways
+* nearshortest.py: extraction of shortest paths (needs cleanup)
 
