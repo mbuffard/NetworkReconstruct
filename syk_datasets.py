@@ -15,10 +15,12 @@ for filename in targetfiles:
     targets = load_targets(os.path.join(targetfolder, filename))
     all_targets.append(targets)
     rank_file = os.path.join(outfolder, "%s__pathways.tsv" % filename)
-    network_file = os.path.join(outfolder, "%s__network.tsv" % filename)
+    network_file_name = os.path.join(outfolder, "%s__network" % filename)
 
-#    rank(targets, pathways, allmembers, rank_file )
-    build_network(rank_file, network_file )
-    break
+    rank(targets, pathways, allmembers, rank_file )
+    build_network(rank_file, network_file_name, targets )
+
+
+merge_ranks(outfolder, targetfiles, "merged_pathways.tsv")
 
 

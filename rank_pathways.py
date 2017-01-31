@@ -6,6 +6,9 @@ import math
 import fisher
 import networkx as nx
 
+import converter
+
+
 cachedir = os.path.join(os.getenv("HOME"), "pathwaycache", "kegg_reboot", "pathways")
 keggmembers = os.path.join(cachedir, "members.txt")
 
@@ -19,12 +22,13 @@ def rank(targets, pathways, allmembers, outname):
     out = open(outname, 'w')
     for uid,name,members in pathways:
         pmembers = members.intersection(realtargets)
+        pmember_names = [ converter.handler.to_symbol(uid) for uid in pmembers ]
         C  = len(members)
         Cn = len(pmembers)
         score = fisher.pvalue_population(Cn, C, Pn, P).two_tail
         log_score = math.log(score, 10)
         if (float(Cn)/C) < Pr: log_score = -log_score
-        out.write("%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers)))
+        out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
     out.close()
 
 def load_pathways(membersfile):
@@ -48,35 +52,44 @@ def load_targets(targetfile):
     return targets
 
 def merge_ranks(outfolder, targetfiles, outname):
-    all_scores = []
+    all_data = []
+    pid_name = {}
     for filename in targetfiles:
         f = open( os.path.join(outfolder, "%s__pathways.tsv" % filename) )
-        cur_scores = {}
-        all_scores.append(cur_scores)
+        cur_data = {}
+        all_data.append(cur_data)
         for line in f:
             data = line.strip('\n').split('\t')
-            cur_scores[data[0]] = data[3]
+            pid = data[0]
+            members = data[5].strip()
+            member_names = data[6].strip()
+            cur_data[pid] = (data[3],members, member_names)
+            pid_name[pid] = data[4]
         f.close()
     
-    all_keys = set(all_scores[0].keys())
-    for cur_scores in all_scores:
+    all_keys = set(all_data[0].keys())
+    for cur_scores in all_data:
         all_keys.intersection_update(cur_scores.keys())
 
     # write all scores
     out = open(os.path.join(outfolder,outname), 'w')
-    header = ""
+    header = "PID\tName"
     for filename in targetfiles:
-        header += '\t%s' % filename
+        header += '\t%s score\t%s members\t%s names' % (filename,filename,filename)
     out.write('%s\n' % header.strip())
     for key in all_keys:
-        out.write(key)
-        for cur_scores in all_scores:
-            out.write("\t%s" % cur_scores[key])
+        name = pid_name[key]
+        out.write("%s\t%s" % (key,name))
+        for cur_data in all_data:
+            score,members, member_names = cur_data[key]
+            out.write("\t%s\t%s\t%s" % (score,members, member_names))
         out.write('\n')
     out.close()
 
 
-def build_network(rank_file, network_file):
+def build_network(rank_file, network_file_name, targets):
+    network_file = "%s.tsv" % network_file_name
+    nodes_file = "%s_nodes.tsv" % network_file_name
     ranked = []
     f = open(rank_file)
     for line in f:
@@ -100,11 +113,23 @@ def build_network(rank_file, network_file):
         print(pid,score,members)
     
     out = open(network_file, 'w')
+    thenodes = set()
     for src,tgt,data in net.edges(data=True):
+        thenodes.add(src)
+        thenodes.add(tgt)
         origin = ','.join(data['origin'])
         rel = ','.join(data['rel'])
         sign = data['sign']
         out.write('%s\t%s\t%s\t%s\t%s\n' % (src,tgt,rel, sign, origin))
+    out.close()
+    
+    out = open(nodes_file, 'w')
+    for uid in thenodes:
+        name = converter.handler.to_symbol(uid)
+        if uid in targets:
+            out.write('%s\t%s\tx\n' % (uid, name))
+        else:
+            out.write('%s\t%s\t\n' % (uid, name))
     out.close()
 
 
