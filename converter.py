@@ -3,7 +3,7 @@ from __future__ import print_function
 import os
 import sys
 
-mapping_dir = os.path.join(os.getenv("HOME"), "mapping")
+mapping_dir = os.path.join(os.getenv("HOME"), 'pathwaycache', 'mapping')
 mapping_file = os.path.join(mapping_dir, "uniprot_ready.txt")
 
 # source files
