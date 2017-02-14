@@ -19,8 +19,8 @@ rank_file = os.path.join(outfolder, "%s__pathways.tsv" % filename)
 network_file_name = os.path.join(outfolder, "%s__network" % filename)
 
 # The OBO file describes the GO hierarchy, the GOA files associates terms to Uniprot IDs
-obo_filename = "/home/aurelien/go-basic.obo"
-goa_filename = "/home/aurelien/Downloads/goa_human.gaf.gz"
+obo_filename = os.path.join(os.getenv("HOME"), "Downloads", "go-basic.obo")
+goa_filename = os.path.join(os.getenv("HOME"), "Downloads", "goa_human.gaf.gz")
 
 
 # the groups of GO terms of interest
