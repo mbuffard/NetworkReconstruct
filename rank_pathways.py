@@ -113,6 +113,7 @@ def build_network(rank_file, network_file_name, targets):
         print(pid,score,members)
     
     out = open(network_file, 'w')
+    out.write('Source\tTarget\tRel\tSign\tOrigin\n')
     thenodes = set()
     for src,tgt,data in net.edges(data=True):
         thenodes.add(src)
@@ -124,6 +125,7 @@ def build_network(rank_file, network_file_name, targets):
     out.close()
     
     out = open(nodes_file, 'w')
+    out.write('PID\tName\tDataset\n')
     for uid in thenodes:
         name = converter.handler.to_symbol(uid)
         if uid in targets:

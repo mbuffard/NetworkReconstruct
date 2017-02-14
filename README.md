@@ -42,4 +42,5 @@ Code files
   It can also rank the pathways according to pvalue and select the ones to build a network
 * syk_datasets.py: define input and output and calls code from rank_pathways
 * nearshortest.py: extraction of shortest paths (needs cleanup)
+* parsego.txt: load the GO association data and extract associations to specific sets of terms
 

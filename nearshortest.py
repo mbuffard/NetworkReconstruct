@@ -75,8 +75,8 @@ def find_paths(G, bests, targets, tfile, overflow=0.1, title="shortests", outfol
         out.write("UID\tLabel\tBest\tOverflow\n")
         for n in selected_nodes:
             b = bests[n]
-            name = names[n]
-            out.write("%s\t%s\t%s\t%s\n" % (n, name, b, overflow-selected_nodes[n]))
+#            name = names[n]
+            out.write("%s\t%s\t%s\n" % (n, b, overflow-selected_nodes[n]))
 
     return selected_edges, selected_nodes
 
