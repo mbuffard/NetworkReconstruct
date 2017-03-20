@@ -23,11 +23,18 @@ def rank(targets, pathways, allmembers, outname):
     for uid,name,members in pathways:
         pmembers = members.intersection(realtargets)
         pmember_names = [ converter.handler.to_symbol(uid) for uid in pmembers ]
+        if pmembers == None or pmember_names == None:
+            continue
+        if None in pmember_names:
+            pmember_names.remove(None)
+        if None in pmembers:
+            pmembers.remove(None)
         C  = len(members)
         Cn = len(pmembers)
         score = fisher.pvalue_population(Cn, C, Pn, P).two_tail
         log_score = math.log(score, 10)
         if (float(Cn)/C) < Pr: log_score = -log_score
+        print((uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
         out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
     out.close()
 
