@@ -1,5 +1,8 @@
 NetworkReconstruct
-##################
+==================
+
+Reconstruct a network associated to a list of target proteins, based on enriched pathways.
+See http://dx.doi.org/10.1371/journal.pcbi.1005432
 
 
 Requirements (using miniconda is encouraged)
@@ -24,7 +27,6 @@ Other useful packages:
 
 * pandas (R-like dataframe)
 * matplotlib and seaborn (plotting)
-* sklearn (machine learning, PCA)
 * jupyter (notebook)
 
 
