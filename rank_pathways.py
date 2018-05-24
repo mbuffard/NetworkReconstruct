@@ -163,5 +163,21 @@ def merge_pathway_in_network(net, pid):
         net.add_edge(src,tgt, rel=rel, sign=sign, origin=origin)
 
 
+def add_weights(filename, score_func):
+    arc_list = []
+    with open( filename ) as f:
+        header = f.readline().strip('\n').split('\t')
+        for line in f:
+            row = line.strip('\n').split('\t')
+            source_node = row[0]
+            target_node = row[1]
+            if "None" == source_node or "None" == target_node: continue
+            weight = score_func(source_node, target_node)
+            arc_list.append( (source_node, target_node, weight) )
+        f.close()
+    
+    return arc_list
+
+
 pathways, allmembers = load_pathways(keggmembers)
 
