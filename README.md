@@ -21,12 +21,13 @@ Requirements
 
 A conda environment with all requirements can be created with the following commands:
 
+```
 conda create -n bio python
 source activate bio
 
 conda install networkx biopython
 pip install git+https://github.com/brentp/fishers_exact_test.git
-
+```
 
 Other useful packages:
 
@@ -34,9 +35,10 @@ Other useful packages:
 * matplotlib and seaborn (plotting)
 * jupyter (notebook)
 
-
+They can be added to your conda environment with:
+```
 conda install pandas seaborn jupyter
-
+```
 
 
 Source files
