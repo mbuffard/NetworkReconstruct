@@ -4,6 +4,7 @@ import os
 import sys
 import math
 import networkx as nx
+import converter
 
 
 ############################### Creating the graph ############################
@@ -76,12 +77,12 @@ def find_paths(G, bests, targets, tfile, overflow=0.1, title="shortests", outfol
         for n in selected_nodes:
             b = bests[n]
 #            name = names[n]
-            out.write("%s\t%s\t%s\n" % (n, b, overflow-selected_nodes[n]))
+            out.write("%s\t%s\t%s\t%s\n" % (n, b, overflow-selected_nodes[n], converter.handler.to_symbol(n) ))
 
     return selected_edges, selected_nodes
 
 
-
+# don't execute this part of the code when imported in another script
 if __name__ == '__main__':
 
     overflow = .2

@@ -4,7 +4,7 @@ import sys
 import gzip
 
 # Define a set of GO terms of interest
-target_terms = {
+'''target_terms = {
     "cell adhesion and motility": ("GO:0048870","GO:0007155", "GO:0034330",  'GO:0022610', 'GO:0060352', 'GO:0030030', ), # localisation: 'GO:0030054'
     "cell growth and death": ("GO:0008283", "GO:0007049", "GO:0008219", "GO:0019835", "GO:0000920", 'GO:0007569', 'GO:0051301', 'GO:0060242'),
     "cell transport and metabolism": ("GO:0044237", "GO:1990748", "GO:0010496", "GO:1990748"),
@@ -14,7 +14,7 @@ target_terms = {
     "pTyrMod": ("GO:0004725", "GO:0004713"),
     "yphosphatase": ("GO:0004725",),
     "ykinase": ("GO:0004713",),
-}
+}'''
 
 
 # The OBO file describes the GO hierarchy
@@ -22,7 +22,7 @@ target_terms = {
 obo_filename = "/home/aurelien/go-basic.obo"
 goa_filename = "/home/aurelien/Downloads/goa_human.gaf.gz"
 
-
+#return a dictionary with uniprot id as key associated to go number
 def load_goa(filename):
     'Flatten the GOA file into a simple two column file'
     
@@ -32,7 +32,7 @@ def load_goa(filename):
     
     uid2go = {}
     
-    # read the source annotation file
+    # read the source annotation file 
     c = 0
     f = gzip.open(filename, 'rt')
     for line in f:
@@ -49,19 +49,23 @@ def load_goa(filename):
     
     return uid2go
 
-
+# called by load target
+# return ids protein for a go term
 def find_target(go, terms, go2target):
     if go in go2target:
         return go2target[go]
 
     target = set()
     if go in terms:
+		# search a parent go term which is present in go2target and add it to target
         for parent in terms[go][-1]:
             target.update( find_target(parent, terms, go2target) )
+	
+	# update go2target but only for the last parent in the list
     go2target[go] = target
     return target
 
-
+# 
 def load_targets(all_targets, target_terms, uid2go, obo_filename):
     'Find all UIDs associated to the selected GO terms'
     
@@ -79,6 +83,7 @@ def load_targets(all_targets, target_terms, uid2go, obo_filename):
 
     in_bloc = False
     f = open(obo_filename)
+	# extract go numbers, name and relations between go terms
     for line in f:
         line = line.strip()
 

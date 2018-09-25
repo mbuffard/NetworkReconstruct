@@ -257,6 +257,27 @@ handler = UniprotMapper()
 
 if __name__ == "__main__":
     print( len(handler.mapping), "items" )
+    print ('P30450 -->',handler.to_external(2,'P30450'))
+    print (handler.mapping['P43405'])
+    print (handler.import_symbol('P43405'))
+    #print (UniprotMapper.)
+    print (handler.to_symbol('P43405'))
+    input_file=open("../udg75/udg75_corr.txt","r")
+    output_file=open("../udg75/udg75_corr_genes.txt","w")
+    for ligne in input_file:
+    	print (handler.to_symbol(ligne.split()[0]))
+    	output_file.write(ligne.split()[0]+"\t"+str(handler.to_symbol(ligne.split()[0]))+"\n")
+    input_file.close()
+    output_file.close()
+    print ("nouveau fichier : "+handler.to_symbol("P35221"))
+    f=open("additional_edges.txt","r")
+    g=open("additional_edges_gene.txt","w")
+    for l in f:
+    	l=l.strip()
+    	g.write(l.split()[0]+"\t"+handler.to_symbol(l.split()[0])+"\t"+l.split()[1]+"\t"+handler.to_symbol(l.split()[1])+"\t"+l.split()[2]+"\n")
+    g.close()
+    f.close()
+
 #        print "Reverse:"
 #        for r in handler.reverse:
 #            print "  ", len(r)
@@ -268,7 +289,5 @@ if __name__ == "__main__":
 #        print 'P43405 -->', handler.to_external(1, 'P43405')
 #        print 'P30450 -->', handler.duplicates['P30450']
 #        print 'P30450 -->', handler.to_external(1, 'P30450')
-#        print 'P30450 -->', handler.to_external(2, 'P30450')
-
 #        print 'HGNC:4931 --> ', handler.to_uniprot(1, 'HGNC:4931')
 

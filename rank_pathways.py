@@ -9,7 +9,7 @@ import networkx as nx
 import converter
 
 
-cachedir = os.path.join(os.getenv("HOME"), "pathwaycache", "kegg_reboot", "pathways")
+cachedir = os.path.join(os.getenv("HOME"), "pathwaycache", "all_pathways_KEGG&PC2", "pathways")
 keggmembers = os.path.join(cachedir, "members.txt")
 
 def rank(targets, pathways, allmembers, outname):
@@ -27,8 +27,10 @@ def rank(targets, pathways, allmembers, outname):
         Cn = len(pmembers)
         score = fisher.pvalue_population(Cn, C, Pn, P).two_tail
         log_score = math.log(score, 10)
-        if (float(Cn)/C) < Pr: log_score = -log_score
+        if (float(Cn)/C) < Pr: 
+            log_score = -log_score
         out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
+        
     out.close()
 
 def load_pathways(membersfile):
@@ -110,7 +112,7 @@ def build_network(rank_file, network_file_name, targets):
                 continue
         merge_pathway_in_network(net, pid)
         covered.update(members)
-        print(pid,score,members)
+        #print(pid,score,members)
     
     out = open(network_file, 'w')
     out.write('Source\tTarget\tRel\tSign\tOrigin\n')
@@ -138,6 +140,7 @@ def build_network(rank_file, network_file_name, targets):
 def merge_pathway_in_network(net, pid):
     pathway_file = os.path.join(cachedir, '%s.txt' % pid)
     f = open(pathway_file)
+    #print (pathway_file)
     for line in f:
         src,tgt,rel,sign = line.strip('\n').split('\t')
         current = net.get_edge_data(src,tgt)
