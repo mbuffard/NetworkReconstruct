@@ -23,12 +23,19 @@ def rank(targets, pathways, allmembers, outname):
     for uid,name,members in pathways:
         pmembers = members.intersection(realtargets)
         pmember_names = [ converter.handler.to_symbol(uid) for uid in pmembers ]
+        if pmembers == None or pmember_names == None:
+            continue
+        if None in pmember_names:
+            pmember_names.remove(None)
+        if None in pmembers:
+            pmembers.remove(None)
         C  = len(members)
         Cn = len(pmembers)
         score = fisher.pvalue_population(Cn, C, Pn, P).two_tail
         log_score = math.log(score, 10)
         if (float(Cn)/C) < Pr: 
             log_score = -log_score
+        print((uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
         out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
         
     out.close()
@@ -157,6 +164,22 @@ def merge_pathway_in_network(net, pid):
             rel.update(current['rel'])
             origin += current['origin']
         net.add_edge(src,tgt, rel=rel, sign=sign, origin=origin)
+
+
+def add_weights(filename, score_func):
+    arc_list = []
+    with open( filename ) as f:
+        header = f.readline().strip('\n').split('\t')
+        for line in f:
+            row = line.strip('\n').split('\t')
+            source_node = row[0]
+            target_node = row[1]
+            if "None" == source_node or "None" == target_node: continue
+            weight = score_func(source_node, target_node)
+            arc_list.append( (source_node, target_node, weight) )
+        f.close()
+    
+    return arc_list
 
 
 pathways, allmembers = load_pathways(keggmembers)

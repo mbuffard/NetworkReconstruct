@@ -1,9 +1,16 @@
 NetworkReconstruct
-##################
+==================
+
+Reconstruct a network associated to a list of target proteins, based on enriched pathways.
+For a complete description and use case, see the associated publication:
+Naldi A, Larive RM, Czerwinska U, Urbach S, Montcourrier P, Roy C, et al. (2017) Reconstruction and signal propagation analysis of the Syk signaling network in breast cancer cells. PLoS Comput Biol 13(3): e1005432
+http://dx.doi.org/10.1371/journal.pcbi.1005432
+
+This code, like the publication, is free to use and adapt, as long as the original work is cited (CC BY 4.0).
 
 
-Requirements (using miniconda is encouraged)
-============================================
+Requirements
+============
 
 
 * python 3 (may also work with 2.7)
@@ -12,28 +19,30 @@ Requirements (using miniconda is encouraged)
 * fisher (fast implementation used in rank_pathways.py). Use this for python 3.5 (until next release):
   pip install git+https://github.com/brentp/fishers_exact_test.git
 
+A conda environment with all requirements can be created with the following commands:
 
+```
 conda create -n bio python
 source activate bio
 
 conda install networkx biopython
 pip install git+https://github.com/brentp/fishers_exact_test.git
-
+```
 
 Other useful packages:
 
 * pandas (R-like dataframe)
 * matplotlib and seaborn (plotting)
-* sklearn (machine learning, PCA)
 * jupyter (notebook)
 
-
+They can be added to your conda environment with:
+```
 conda install pandas seaborn jupyter
+```
 
 
-
-Code files
-==========
+Source files
+============
 
 * converter.py: protein identifier mapping handles Uniprot and HUGO (gene names) data mappings (uniprot covers KEGG IDs, HUGO provides gene names)
 * import_kegg.py: parse and convert KEGG pathways (from KGML to TSV)
