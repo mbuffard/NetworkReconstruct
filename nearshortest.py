@@ -97,7 +97,7 @@ def find_paths(G, ranks, targets, tfile, overflow=0.1, title="shortests", outfol
 ##            out.write("%s\t%s\t%s\t%s\n" % (n, b, overflow-selected_nodes[n], converter.handler.to_symbol(n) ))
 ### Aurelien
             b = ranks[n]
-            out.write("%s\t%s\t%s\n" % (n, b, overflow-selected_nodes[n]))
+            out.write("%s\t%s\t%s\t%s\n" % (n, b, overflow-selected_nodes[n]),converter.handler.to_symbol(n))
 ###
 
     return selected_edges, selected_nodes
