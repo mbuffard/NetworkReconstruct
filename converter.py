@@ -3,7 +3,7 @@ from __future__ import print_function
 import os
 import sys
 
-mapping_dir = os.path.join(os.getenv("HOME"), 'pathwaycache', 'mapping')
+mapping_dir = os.path.join( './pathwaycache', 'mapping')
 mapping_file = os.path.join(mapping_dir, "uniprot_ready.txt")
 
 # source files
@@ -256,7 +256,8 @@ def import_uniprot_mapping(databases=["KEGG", "HGNC"]):
 handler = UniprotMapper()
 
 if __name__ == "__main__":
-    print( len(handler.mapping), "items" )
+    print (handler.to_symbol('Q04759'))
+    '''print( len(handler.mapping), "items" )
     print ('P30450 -->',handler.to_external(2,'P30450'))
     print (handler.mapping['P43405'])
     print (handler.import_symbol('P43405'))
@@ -276,7 +277,7 @@ if __name__ == "__main__":
     	l=l.strip()
     	g.write(l.split()[0]+"\t"+handler.to_symbol(l.split()[0])+"\t"+l.split()[1]+"\t"+handler.to_symbol(l.split()[1])+"\t"+l.split()[2]+"\n")
     g.close()
-    f.close()
+    f.close()''
 
 #        print "Reverse:"
 #        for r in handler.reverse:
@@ -289,5 +290,5 @@ if __name__ == "__main__":
 #        print 'P43405 -->', handler.to_external(1, 'P43405')
 #        print 'P30450 -->', handler.duplicates['P30450']
 #        print 'P30450 -->', handler.to_external(1, 'P30450')
-#        print 'HGNC:4931 --> ', handler.to_uniprot(1, 'HGNC:4931')
+#        print 'HGNC:4931 --> ', handler.to_uniprot(1, 'HGNC:4931')'''
 
