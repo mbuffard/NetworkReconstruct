@@ -61,14 +61,12 @@ def find_paths(G, ranks, targets, tfile, overflow=0.1, title="shortests", outfol
             if t not in ranks: continue
             selected_nodes[t] = o
             cur_best = ranks[t]
-#            print( "%s (%s)" % ( t, cur_best ))
             for n in G.predecessors(t):
                 if n not in ranks: continue # not reachable from the source
                 prev_best = ranks[n]
                 prev_distance = G.get_edge_data(n,t)['weight']
                 cur_o = prev_best +  prev_distance - cur_best
                 if cur_o > o: continue # too much longer than the shortest path
-#                print( "  %s:   %s (+%s)" % (n,prev_best, cur_o))
                 cur_score = o - cur_o
                 selected_edges[ (n,t) ] = overflow - cur_score
                 best_known = -1
@@ -90,14 +88,12 @@ def find_paths(G, ranks, targets, tfile, overflow=0.1, title="shortests", outfol
     with open( os.path.join(outfolder, "%s_%s_nodes.tsv" % (title,tfile)), 'w' ) as out:
         out.write("UID\tLabel\tBest\tOverflow\n")
         for n in selected_nodes:
-<<<<<<< HEAD
-#### MARION
-##            b = bests[n]
-## #            name = names[n]
-##            out.write("%s\t%s\t%s\t%s\n" % (n, b, overflow-selected_nodes[n], converter.handler.to_symbol(n) ))
-### Aurelien
             b = ranks[n]
-            out.write("%s\t%s\t%s\t%s\n" % (n, b, overflow-selected_nodes[n]),converter.handler.to_symbol(n))
+            if converter.handler.to_symbol(n):
+                out.write("%s\t%s\t%s\t%s\n" % (n,converter.handler.to_symbol(n), b, overflow-selected_nodes[n], ))
+            else:
+                out.write("%s\t%s\t%s\t%s\n" % (n,n, b, overflow-selected_nodes[n]))
+
 ###
 
     return selected_edges, selected_nodes
