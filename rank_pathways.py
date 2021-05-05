@@ -3,14 +3,12 @@ from __future__ import print_function
 import os
 import os.path
 import math
+import converter
 import fisher
 import networkx as nx
 
-import converter
 
 
-cachedir = os.path.join(os.getenv("HOME"), "pathwaycache", "all_pathways_KEGG&PC2", "pathways")
-keggmembers = os.path.join(cachedir, "members.txt")
 
 def rank(targets, pathways, allmembers, outname):
     P = len(allmembers)
@@ -35,7 +33,7 @@ def rank(targets, pathways, allmembers, outname):
         log_score = math.log(score, 10)
         if (float(Cn)/C) < Pr: 
             log_score = -log_score
-        print((uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
+        #print((uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
         out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
         
     out.close()
@@ -57,6 +55,7 @@ def load_targets(targetfile):
     targets = set()
     f = open(targetfile)
     for line in f:
+        clean_target=converter.handler.clean_uid(line.strip().split('\t')[0])
         targets.add(line.strip().split('\t')[0])
     return targets
 
@@ -96,7 +95,9 @@ def merge_ranks(outfolder, targetfiles, outname):
     out.close()
 
 
-def build_network(rank_file, network_file_name, targets):
+
+#to do add selection mode option
+def build_network(rank_file, network_file_name, targets,cachedir,selection_mode):
     network_file = "%s.tsv" % network_file_name
     nodes_file = "%s_nodes.tsv" % network_file_name
     ranked = []
@@ -105,7 +106,8 @@ def build_network(rank_file, network_file_name, targets):
         data = line.strip('\n').split('\t')
         pid = data[0]
         members = data[5].strip()
-        if not members: continue
+        if selection_mode==1:
+            if not members: continue
         members = set( members.split(',') )
         score = float(data[3])
         ranked.append( (pid, score, members) )
@@ -114,12 +116,19 @@ def build_network(rank_file, network_file_name, targets):
     covered = set()
     net = nx.DiGraph()
     for pid,score,members in ranked:
-        if score > -2:
-            if not members.difference(covered):
-                continue
-        merge_pathway_in_network(net, pid)
-        covered.update(members)
-        #print(pid,score,members)
+        #selection mode 1 for enriched pathways, 2 for all pathways
+        if selection_mode==1:
+            if score > -2:
+                if not members.difference(covered):
+                    continue
+            merge_pathway_in_network(net, pid,cachedir)
+            covered.update(members)
+        if selection_mode==2:
+            merge_pathway_in_network(net, pid,cachedir)
+            covered.update(members)
+
+
+
     
     out = open(network_file, 'w')
     out.write('Source\tTarget\tRel\tSign\tOrigin\n')
@@ -144,7 +153,7 @@ def build_network(rank_file, network_file_name, targets):
     out.close()
 
 
-def merge_pathway_in_network(net, pid):
+def merge_pathway_in_network(net, pid,cachedir):
     pathway_file = os.path.join(cachedir, '%s.txt' % pid)
     f = open(pathway_file)
     #print (pathway_file)
@@ -181,6 +190,57 @@ def add_weights(filename, score_func):
     
     return arc_list
 
+def add_direct_from_file():
+    node=open(os.path.join(outfolder, "%s__network_nodes.tsv" % filename),"a")
+    net=open (os.path.join(outfolder, "%s__network.tsv" % filename),"a")
+    with open( os.path.join(work_folder, "additional_edges_gene.txt")) as neighb:
+    #ligne=neighb.readline()
+        for line in neighb:
+            sourceID = line.strip('\n').split('\t')[0]
+            targetID = line.strip('\n').split('\t')[2]
+            rel = line.strip('\n').split('\t')[4]
+            net.write(sourceID+"\t"+targetID+"\t"+rel+"\t "+"\t"+"additional_edges"+"\n")
+        # add node in node file if not yet
+            if sourceID not in node_file:
+                node.write(sourceID+"\t"+line.strip('\n').split('\t')[1]+"\t"+" "+"\n")
+                node_file[sourceID]=line.strip('\n').split('\t')[1]
+            if targetID not in node_file:
+                node_file[targetID]=line.strip('\n').split('\t')[3]
+                node.write(targetID+"\t"+line.strip('\n').split('\t')[3]+"\t"+" "+"\n")     
 
-pathways, allmembers = load_pathways(keggmembers)
+    node.close()
+    net.close()
+    neighb.close()
+
+
+def add_direct_from_list(direct_subs,sourceID,outfolder,filename):
+    node=open(os.path.join(outfolder, "%s__network_nodes.tsv" % filename),"r")
+    node_file={}
+    targets=set()
+    for line in node:
+        node_file[line.strip('\n').split('\t')[0]]=line.strip('\n').split('\t')[1]
+    node.close()
+
+    node=open(os.path.join(outfolder, "%s__network_nodes.tsv" % filename),"a")
+    net=open (os.path.join(outfolder, "%s__network.tsv" % filename),"a")
+    for targetID in direct_subs.split(): 
+        targets.add(targetID)           
+        net.write(sourceID+"\t"+targetID+"\t"+"\t "+"\t"+"additional_edges"+"\n")            
+        if targetID not in node_file:
+            node_file[targetID]='geneName'
+            if converter.handler.to_symbol(targetID):
+                node.write(targetID+"\t"+converter.handler.to_symbol(targetID)+"\t"+" "+"\n")
+            else:
+                node.write(targetID+"\t"+targetID+"\t"+" "+"\n")
+    if sourceID not in node_file:
+        node.write(sourceID+"\t"+'geneName'+"\t"+" "+"\n")
+    return targets
+    
+
+    node.close()
+    net.close()
+
+
+
+
 
