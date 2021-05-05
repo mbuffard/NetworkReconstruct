@@ -31,7 +31,7 @@ def rank(targets, pathways, allmembers, outname):
             pmembers.remove(None)
         C  = len(members)
         Cn = len(pmembers)
-        score = fisher2.pvalue_population(Cn, C, Pn, P).two_tail
+        score = fisher.pvalue_population(Cn, C, Pn, P).two_tail
         log_score = math.log(score, 10)
         if (float(Cn)/C) < Pr: 
             log_score = -log_score
