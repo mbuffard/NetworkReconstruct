@@ -6,7 +6,7 @@ import math
 import converter
 import fisher
 import networkx as nx
-
+import time
 
 
 
@@ -18,6 +18,8 @@ def rank(targets, pathways, allmembers, outname):
     
     # score it all
     out = open(outname, 'w')
+    depart = time.time()
+    print(depart)
     for uid,name,members in pathways:
         pmembers = members.intersection(realtargets)
         pmember_names = [ converter.handler.to_symbol(uid) for uid in pmembers ]
@@ -29,7 +31,7 @@ def rank(targets, pathways, allmembers, outname):
             pmembers.remove(None)
         C  = len(members)
         Cn = len(pmembers)
-        score = fisher.pvalue_population(Cn, C, Pn, P).two_tail
+        score = fisher2.pvalue_population(Cn, C, Pn, P).two_tail
         log_score = math.log(score, 10)
         if (float(Cn)/C) < Pr: 
             log_score = -log_score
@@ -37,6 +39,10 @@ def rank(targets, pathways, allmembers, outname):
         out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
         
     out.close()
+    
+    fin = time.time()
+    print(fin)
+    print("--- %s seconds ---" % (fin - depart))
 
 def load_pathways(membersfile):
     f = open(membersfile)
