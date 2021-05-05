@@ -2,7 +2,7 @@ from tkinter import filedialog
 from tkinter import *
 from tkinter.messagebox import *
 from tkinter import ttk
-from tkinter import ttk
+
 
 
 
@@ -16,9 +16,11 @@ class Interface(Frame):
 		self.databasePC=IntVar()   
 		self.filename=None
 		self.work_folder=None
+		
 		self.addSubstOption=IntVar()  
 		self.addKinPhos=IntVar() 
 		self.addSpecMod=IntVar() 
+		self.addGlobal=IntVar()
 		self.OverflowOption=IntVar()
 		self.overflowValue =IntVar()
 		self.target_extract_option=IntVar()
@@ -26,6 +28,7 @@ class Interface(Frame):
 		self.source=StringVar()   
 		self.subs=StringVar()
 		self.Mod_list=StringVar()
+		self.Cell_line=StringVar()
 		self.KinPhos_mod=[]
 		self.subset_targets=StringVar()
 		self.selection=IntVar()
@@ -37,6 +40,8 @@ class Interface(Frame):
 
 		Frame.__init__(self, fenetre, width=768, height=576, **kwargs)
 		self.pack(fill=BOTH)
+		#todo nicer windows
+		#self.config(background='#41B77F')
 
 		self.frame1=Frame(self,relief=GROOVE)
 		self.frame1.grid(row=0, column=2, columnspan=3, rowspan=19)
@@ -166,6 +171,13 @@ class Interface(Frame):
 		self.SpecModOption_list=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.Mod_list)
 		self.SpecModOption_list.grid(row=13,column=2)
 
+		#option to add global proteomic data for a specified cell line
+		self.addGlobalProteomic=Checkbutton(self,text="Add global proteomic data from CCLE",command=self.Able_cellLine,variable=self.addGlobal,font=("Helvetica"))
+		self.addGlobalProteomic.grid(row=14,column=0)
+		
+		self.SpecCellLine_list=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.Cell_line)
+		self.SpecCellLine_list.grid(row=14,column=2)
+
 
 		self.add_overflow = Checkbutton(self, variable=self.OverflowOption,text="Add overflow (in % of the shortest path length) :", font=("Helvetica"),command=self.Able_scaleOverflow)
 		self.add_overflow.grid(row=15, column=0)
@@ -246,6 +258,12 @@ class Interface(Frame):
 			self.SpecModOption_list.configure(state=NORMAL) 
 		else:
 			self.SpecModOption_list.configure(state=DISABLED)
+	
+	def Able_cellLine(self):
+		if self.addGlobal.get()==1:
+			self.SpecCellLine_list.configure(state=NORMAL)
+		else:
+			self.SpecCellLine_list.configure(state=DISABLED)
 
 	def Able_scaleOverflow(self):
 		if self.OverflowOption.get()==1:
@@ -329,6 +347,12 @@ class Interface(Frame):
 		else:
 			self.SpecModOption.config(fg='black')
 
+		if self.addGlobal.get()==1 and self.Cell_line.get()=="":
+			self.SpecCellLine_list.config(fg='red')
+			self.check=0
+		else:
+			self.SpecCellLine_list.config(fg='black')
+
 		if self.OverflowOption.get()==1 and self.overflowValue.get()==0:
 			self.add_overflow.config(fg='red')
 			self.check=0
@@ -354,6 +378,7 @@ class Interface(Frame):
 
 fenetre = Tk()
 fenetre.title("Phos2Net")
+#fenetre.config(background='#41B77F')
 #img = fenetre.Image("photo", file="LogoPhos2Net.png")
 img = Image("photo", file="LogoPhos2Net.gif")
 fenetre.tk.call('wm','iconphoto',fenetre._w, img)

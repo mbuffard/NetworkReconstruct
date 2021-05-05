@@ -9,10 +9,13 @@ import parsego
 import shutil
 import converter
 import GUI
+import global_prot
 from tkinter import *
 from os.path import basename
 from GUI import interface
 from tkinter import ttk
+from datetime import datetime
+
 
 ####################################################################################################################################################################
 # This code is an improvement of the code from Naldi A, Larive RM, Czerwinska U, Urbach S, Montcourrier P, Roy C, et al. (2017), PLoS Comput Biol 13(3)
@@ -45,6 +48,10 @@ source = converter.handler.clean_uid(interface.source.get())
 rank_file = os.path.join(outfolder, "%s__pathways.tsv" % filename)
 network_file_name = os.path.join(outfolder, "%s__network" % filename)
 #############################################################
+log_file_name=os.path.join(outfolder, "%s__log_file" % filename)
+log_file=open(log_file_name,'w')
+
+log_file.write("file : "+str(datetime.now())+"\n"+filename+"\n\n"+"source : "+source+"\n\n")
 
 # The OBO file describes the GO hierarchy, the GOA files associates terms to Uniprot IDs
 obo_filename = os.path.join('./pathwaycache', 'GO', "go-basic.obo")
@@ -56,38 +63,55 @@ goa_filename = os.path.join('./pathwaycache', 'GO', "goa_human.gaf.gz")
 
 p_mod = set()
 if interface.addKinPhos.get()==1:
+	log_file.write("===================\n"+"protein(s) promoted : "+"\n")
 	if 0 in interface.KinPhos_mod:
 		f = open(os.path.join('Modifiers/Tyr_Kinase.txt'),'r')
+		log_file.write("Tyrosine kinases"+'\n')
 		for line in f:
 			data=line.strip('\n').split('\t')
 			p_mod.add(data[0])
 		f.close()
 	if 1 in interface.KinPhos_mod:
 		f=open(os.path.join('Modifiers/Tyr_phosphatase.txt'),'r')
+		log_file.write("Tyrosine phosphatases"+"\n")
 		for line in f:
 			data = line.strip('\n').split('\t')
 			p_mod.add(data[0])
 		f.close()
 	if 2 in interface.KinPhos_mod:	
 		f=open(os.path.join('Modifiers/ST_kinase.txt'),'r')
+		log_file.write("Serine threonine kinases"+"\n")
 		for line in f:
 			data = line.strip('\n').split('\t')
 			p_mod.add(data[0])
 		f.close()
 	if 3 in interface.KinPhos_mod:	
 		f=open(os.path.join('Modifiers/ST_phosphatase.txt'),'r')
+		log_file.write("Serine threonine phosphatases"+"\n")
 		for line in f:
 			data = line.strip('\n').split('\t')
 			p_mod.add(data[0])
 		f.close()
 if interface.addSpecMod.get()==1:
 	for uniprot in interface.Mod_list.get().split():
-		uniprot
 		uniprot=converter.handler.clean_uid(uniprot)
+		log_file.write(converter.handler.clean_uid(uniprot)+"\t")
 		p_mod.add(uniprot)
 ###################################################################################################
+log_file.write("===================\n")
 
 
+
+###################################################################################################
+#load global proteomic data
+globalProteomic=set()
+if interface.addGlobal.get()==1:
+	cell_line=interface.Cell_line.get()
+	globalProteomic=global_prot.extractData(cell_line)
+	globalProtData=1
+else:
+	globalProtData=0
+#####################################################################################################
 
 # the groups of GO terms of interest
 target_terms = {
@@ -129,44 +153,72 @@ def ptyr_score(source_node, target_node):
 
 	return WEIGHTS[wkey]
 
-#############################################
+############################## To be studied###########################################
+def globalProt_score(source_node,target_node):
+	"""if source_node not in globalProteomic or target_node not in globalProteomic:
+		return 100
+	else:"""
+	return ptyr_score(source_node,target_node)
 
+
+#############################################
 def get_rate(weight):
-	return 10 - weight
+	return 10-weight
+
+"""
+def get_rate(weight):
+	if weight==100:
+		return 1
+	else:
+		return 10 - weight
+"""
+
+########################## To be studied################################################
 
 #convert unreviewed uniprot name into a reviewed one with same HGNC and load the targets
+#to do advert for untaken proteins
 targets = load_targets( filename_location)
 
 
-
+log_file.write("===================\n"+"databases : "+"\n")
 #select the database according to formula value and write the pathway file with score
 if interface.databaseKEGG.get()==1 and interface.databasePC.get()==0:
 	cachedir=os.path.join( "pathwaycache", "kegg_reboot", "pathways")
+	log_file.write("KEGG"+"\n")
 if interface.databaseKEGG.get()==0 and interface.databasePC.get()==1:
 	cachedir=os.path.join( "pathwaycache", "pc2", "pathways")
+	log_file.write("Pathway Commons")
 if interface.databaseKEGG.get()==1 and interface.databasePC.get()==1:
+	log_file.write("KEGG\nPathway Commons")
 	cachedir=os.path.join("pathwaycache", "all_pathways_KEGG&PC2", "pathways")
+log_file.write("\n===================\n")
 
 members = os.path.join(cachedir, "members.txt")
 pathways, allmembers = load_pathways(members)
 rank(targets, pathways, allmembers, rank_file)
 
 #add selection mode option
-
+log_file.write("selection mode : \n")
 if interface.selection.get()==1:
 	build_network(rank_file, network_file_name, targets,cachedir,1)
+	log_file.write("enriched pathways\n")
 if interface.selection.get()==2:
 	build_network(rank_file, network_file_name, targets,cachedir,2)
+	log_file.write("all pathways \n")
+log_file.write("===================\n")
 
 
 ###############################
 # Add additional_edges
 ###############################
+
 if interface.addSubstOption.get()==1:
+	log_file.write("direct subtrates added :"+"\n")
 	directSubs=(add_direct_from_list(interface.subs.get(),source,outfolder,filename))
 	for subs in directSubs:
 		#convert unreviewed uniprot name into a reviewed one with same HGNC
 		subs=converter.handler.clean_uid(subs)
+		log_file.write(subs+"\t")
 		targets.add(subs)
 
 
@@ -234,7 +286,10 @@ f.close()
 
 ############################################# For all targets (all nodes....)###########################################
 # Add the weights and build the graph for path search
-interactions = add_weights('%s.tsv' % network_file_name, ptyr_score)
+if interface.addGlobal.get()==1:
+	interactions=add_weights('%s.tsv' % network_file_name,globalProt_score)
+else:
+	interactions = add_weights('%s.tsv' % network_file_name, ptyr_score)
 G = nearshortest.load_interactions(interactions)
 
 ranks = nearshortest.rank_paths(G, source)
@@ -249,7 +304,7 @@ Gs = nearshortest.random_walk(reachable, get_rate, source, rpath)
 
 # Compute shortest paths on network after random walk
 ranks_rdm = nearshortest.rank_paths(Gs, source)
-reachable_rdm = G.subgraph(ranks_rdm)
+reachable_rdm = Gs.subgraph(ranks_rdm)
 
 
 
@@ -277,11 +332,73 @@ for tfile in os.listdir(target_files_folder):
 		print( "Reconstruct shortests")
 		
 
-		edges,nodes = nearshortest.find_paths(Gs, ranks_rdm, thetargets, tfile, overflow=0, title="%s_rdm_shortest"%filename, outfolder=outfolder+folder)
+		edges,nodes = nearshortest.find_paths(Gs, ranks_rdm, thetargets, tfile,globalProtData,globalProteomic, overflow=0, title="%s_rdm_shortest"%filename, outfolder=outfolder+folder)
 		if interface.OverflowOption and interface.overflowValue.get()!=0:
-			edges,nodes = nearshortest.find_paths(Gs, ranks_rdm, thetargets, tfile, overflow=interface.overflowValue.get()/100, title="%s_rdm_overflow"%filename, outfolder=outfolder+folder)
+			edges,nodes = nearshortest.find_paths(Gs, ranks_rdm, thetargets, tfile,globalProtData,globalProteomic, overflow=interface.overflowValue.get()/100, title="%s_rdm_overflow"%filename, outfolder=outfolder+folder)
+############################################################################################################################
+
+############################################### sans marche aléatoire ####################################################################
+'''
+if interface.addGlobal.get()==1:
+	interactions=add_weights('%s.tsv' % network_file_name,globalProt_score)
+else:
+	interactions = add_weights('%s.tsv' % network_file_name, ptyr_score)
+G = nearshortest.load_interactions(interactions)
+
+ranks = nearshortest.rank_paths(G, source)
+reachable = G.subgraph(ranks)
+
+
+# Save the reachable graph and the shortest paths
+nearshortest.save_graph(reachable, os.path.join(outfolder, "reachable_sansrdm.tsv"))
+
+
+
+# Compute shortest paths on network after random walk
+ranks_rdm = nearshortest.rank_paths(G, source)
+reachable_rdm = G.subgraph(ranks)
+
+
 
 ############################################################################################################################
+# Reconstruct shortest paths to all target and specified sets of targets (go associated), targets need to be in a file with the uniprot
+
+for tfile in os.listdir(target_files_folder):
+
+	folder=tfile.split('.')[0]
+
+	if not os.path.isdir(outfolder+folder+"/sans_rdm"):
+		os.makedirs(outfolder+folder+"/sans_rdm")
+	print( "#############################################################")
+	print( "#       ", tfile)
+	print( "#############################################################")
+	thetargets = []
+	#extract the targets associated with the go term
+	with open( os.path.join("./targets/", "%s" % tfile) ) as f:
+		for line in f:
+			t = line.strip('\n').split('\t')[0]
+			if t in ranks:
+				thetargets.append(t)
+	#print (thetargets)
+	if thetargets:
+		print( "Reconstruct shortests")
+		
+
+		edges,nodes = nearshortest.find_paths(G, ranks, thetargets, tfile,globalProtData,globalProteomic, overflow=0, title="%s_rdm_shortest"%filename, outfolder=outfolder+folder+"/sans_rdm")
+		if interface.OverflowOption and interface.overflowValue.get()!=0:
+			edges,nodes = nearshortest.find_paths(G, ranks, thetargets, tfile,globalProtData,globalProteomic, overflow=interface.overflowValue.get()/100, title="%s_rdm_overflow"%filename, outfolder=outfolder+folder+"/sans_rdm")
+
+
+'''	
+
+
+
+
+
+##############################################################################################################################################""
+
+
+
 
 
 fenetre = Tk()

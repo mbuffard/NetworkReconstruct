@@ -1,4 +1,8 @@
-Phos2Net
+Phos2Net V1.1
+==================
+this version add a log file in order to save the parameters used for the reconstruction
+
+
 ==================
 
 Reconstruct a network associated to a list of target proteins, based on KEGG and Pathway Common databases.

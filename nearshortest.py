@@ -45,7 +45,7 @@ def rank_paths(G, source):
     return nx.single_source_dijkstra_path_length(G, source)
 
 
-def find_paths(G, ranks, targets, tfile, overflow=0.1, title="shortests", outfolder='subnetworks'):
+def find_paths(G, ranks, targets, tfile, global_prot,globalProteomic, overflow=0.1, title="shortests", outfolder='subnetworks'):
     "Use the previously identified ranks to reconstruct the (near-)shortest paths"
     selected_nodes = {}
     selected_edges = {}
@@ -86,13 +86,37 @@ def find_paths(G, ranks, targets, tfile, overflow=0.1, title="shortests", outfol
             w = G.get_edge_data(e[0],e[1])['weight']
             out.write("%s\t%s\t%s\t%s\n" % (e[0],e[1],selected_edges[e],w))
     with open( os.path.join(outfolder, "%s_%s_nodes.tsv" % (title,tfile)), 'w' ) as out:
-        out.write("UID\tLabel\tBest\tOverflow\n")
+        if global_prot:
+            out.write("UID\tLabel\tBest\tOverflow\tTarget\tGlobal proteomic\n")
+        else:
+            out.write("UID\tLabel\tBest\tOverflow\tTarget\n")
         for n in selected_nodes:
-            b = ranks[n]
-            if converter.handler.to_symbol(n):
-                out.write("%s\t%s\t%s\t%s\n" % (n,converter.handler.to_symbol(n), b, overflow-selected_nodes[n], ))
+            if n in targets:
+                target_value="X"
             else:
-                out.write("%s\t%s\t%s\t%s\n" % (n,n, b, overflow-selected_nodes[n]))
+                target_value="db_prot"
+
+            b = ranks[n]
+            if global_prot:
+                #where
+                if n not in globalProteomic:
+                    if converter.handler.to_symbol(n):
+                        out.write("%s\t%s\t%s\t%s\t%s\tnot detected protein\n" % (n,converter.handler.to_symbol(n), b, overflow-selected_nodes[n],target_value, ))
+                    else:
+                        out.write("%s\t%s\t%s\t%s\t%s\tnot detected protein\n" % (n,n, b, overflow-selected_nodes[n],target_value,))
+                else:
+                    if converter.handler.to_symbol(n):
+                        out.write("%s\t%s\t%s\t%s\t%s\tdetected protein\n" % (n,converter.handler.to_symbol(n), b, overflow-selected_nodes[n], target_value,))
+                    else:
+                        out.write("%s\t%s\t%s\t%s\t%s\tdetected protein\n" % (n,n, b, overflow-selected_nodes[n]),target_value,)
+
+
+
+            else:
+                if converter.handler.to_symbol(n):
+                    out.write("%s\t%s\t%s\t%s\t%s\n" % (n,converter.handler.to_symbol(n), b, overflow-selected_nodes[n],target_value, ))
+                else:
+                    out.write("%s\t%s\t%s\t%s\t%s\n" % (n,n, b, overflow-selected_nodes[n],target_value,))
 
 ###
 
