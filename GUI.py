@@ -216,14 +216,14 @@ class Interface(Frame):
 
 
 		self.SpecCellLine_entry=Entry(self,state=DISABLED,font=("Helvetica"))
-		self.SpecCellLine_entry.grid(row=14,column=5)
+		self.SpecCellLine_entry.grid(row=15,column=2)
 		self.SpecCellLine_entry.bind('<KeyRelease>', SpecCellLine_keyrelease)
 
 		self.SpecCellDefilB = Scrollbar(self, orient='vertical')
-		self.SpecCellDefilB.grid(row=15, column=6, sticky='ns' )
+		self.SpecCellDefilB.grid(row=16, column=3, sticky='ns' )
 
 		self.SpecCellLine_list = Listbox(self,font=("Helvetica"),selectmode=SINGLE,yscrollcommand=self.SpecCellDefilB.set,exportselection=0)
-		self.SpecCellLine_list.grid(row=15,column=5)
+		self.SpecCellLine_list.grid(row=16,column=2)
 		self.SpecCellLine_list.config(width=20,height=2,state=DISABLED)
 
 		self.selectTissue_combobox = ttk.Combobox(self,state=DISABLED,textvariable = self.selected_tissue)
@@ -233,41 +233,41 @@ class Interface(Frame):
 
 
 		self.add_overflow = Checkbutton(self, variable=self.OverflowOption,text="Add overflow (in % of the shortest path length) :", font=("Helvetica"),command=self.Able_scaleOverflow)
-		self.add_overflow.grid(row=15, column=0)
+		self.add_overflow.grid(row=17, column=0)
 
 		self.label_docOverflow=Label(self,text='?',font=("Helvetica", ))
-		self.label_docOverflow.grid(row=15, column=0, sticky='e')
+		self.label_docOverflow.grid(row=17, column=0, sticky='e')
 		self.label_docOverflow.bind('<Enter>', lambda event, text='The "overflow option" will display extra networks\n with alternative paths with a percentage of shortest path extra length.': add_Tooltip(self.label_docOverflow,text))
 		self.label_docOverflow.bind('<Leave>', lambda event :destroy_Tooltip(self))
 
 		self.overflow=Scale(self,state=DISABLED,orient=HORIZONTAL,width=30,length=300,variable=self.overflowValue)
-		self.overflow.grid(row=15,column=2)
+		self.overflow.grid(row=17,column=2)
 
 		#Network extraction
 		self.ExtractionLabel=Label(self,text="Network extraction, enter list of :",font=("Helvetica"))
-		self.ExtractionLabel.grid(row=16,column=0,columnspan=2,pady=5)
+		self.ExtractionLabel.grid(row=18,column=0,columnspan=2,pady=5)
 
 		self.label_docExtraction=Label(self,text='?',font=("Helvetica", ))
-		self.label_docExtraction.grid(row=16, column=0, sticky='e')
+		self.label_docExtraction.grid(row=18, column=0, sticky='e')
 		self.label_docExtraction.bind('<Enter>', lambda event, text='The "extraction option" will display the sub-networks focusing on a subset of targets. \nThese targets can be selected based on GO term associated categories \nand or a specified subset of targets.': add_Tooltip(self.label_docExtraction,text))
 		self.label_docExtraction.bind('<Leave>', lambda event :destroy_Tooltip(self))
 
 
 
 		self.targets=Checkbutton(self,text="Subset of target(s) :",command=self.Able_target_extraction,variable=self.target_extract_option,font=("Helvetica"))
-		self.targets.grid(row=17,column=0)  
+		self.targets.grid(row=19,column=0)  
 
 		self.target_list_extraction=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.subset_targets)
-		self.target_list_extraction.grid(row=17,column=2)
+		self.target_list_extraction.grid(row=19,column=2)
 
 		self.Go_extract=Checkbutton(self,text="GO terms associated categories:",command=self.Able_GOterm_extraction,variable=self.GOterm_extract_option,font=("Helvetica"))
-		self.Go_extract.grid(row=18,column=0)  
+		self.Go_extract.grid(row=20,column=0)  
 
 		self.yDefilCat = Scrollbar(self, orient='vertical')
-		self.yDefilCat.grid(row=18, column=3, sticky='ns' )
+		self.yDefilCat.grid(row=20, column=3, sticky='ns' )
 
 		self.GO_list_extraction=Listbox(self,selectmode=MULTIPLE,font=("Helvetica"),yscrollcommand=self.yDefilCat.set,exportselection=0)
-		self.GO_list_extraction.grid(row=18,column=2)
+		self.GO_list_extraction.grid(row=20,column=2)
 
 		self.yDefilCat['command'] = self.GO_list_extraction.yview
 		for item in ["cell adhesion and motility","cell growth and death","cell transport and metabolism", "immune system and inflammation","cell differentiation"]:
@@ -278,7 +278,7 @@ class Interface(Frame):
 		#submit button
 		self.submit=Button(self, text="Submit", font=("Helvetica"),command=self.cliquerSubmit,)
 		#
-		self.submit.grid(row=19,column=0)
+		self.submit.grid(row=21,column=0)
 
 	#Function to select file
 	def cliquerFile(self):
