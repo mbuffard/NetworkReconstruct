@@ -2,8 +2,6 @@ from tkinter import filedialog
 from tkinter import *
 from tkinter.messagebox import *
 from tkinter import ttk
-from tkinter import ttk
-
 
 
 class Interface(Frame):
@@ -16,9 +14,11 @@ class Interface(Frame):
 		self.databasePC=IntVar()   
 		self.filename=None
 		self.work_folder=None
+		
 		self.addSubstOption=IntVar()  
 		self.addKinPhos=IntVar() 
 		self.addSpecMod=IntVar() 
+		self.addGlobal=IntVar()
 		self.OverflowOption=IntVar()
 		self.overflowValue =IntVar()
 		self.target_extract_option=IntVar()
@@ -26,6 +26,8 @@ class Interface(Frame):
 		self.source=StringVar()   
 		self.subs=StringVar()
 		self.Mod_list=StringVar()
+		self.selected_tissue=StringVar()
+		self.Cell_line=StringVar()
 		self.KinPhos_mod=[]
 		self.subset_targets=StringVar()
 		self.selection=IntVar()
@@ -37,6 +39,8 @@ class Interface(Frame):
 
 		Frame.__init__(self, fenetre, width=768, height=576, **kwargs)
 		self.pack(fill=BOTH)
+		#todo nicer windows
+		#self.config(background='#41B77F')
 
 		self.frame1=Frame(self,relief=GROOVE)
 		self.frame1.grid(row=0, column=2, columnspan=3, rowspan=19)
@@ -166,6 +170,27 @@ class Interface(Frame):
 		self.SpecModOption_list=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.Mod_list)
 		self.SpecModOption_list.grid(row=13,column=2)
 
+		listCCLE = ['autonomic ganglia', 'biliary tract', 'bone', 'breast', 'central nervous system', 'endometrium', 'haematopoietic and lymphoid tissue', 'kidney', 'large intestine', 'liver', 'lung', 'oesophagus', 'ovary', 'pancreas', 'pleura', 'prostate', 'skin', 'soft tissue', 'stomach', 'thyroid', 'upper aerodigestive tract', 'urinary tract']
+		cellLineCCLEdico = {'prostate': ['22RV1_PROSTATE', 'DU145_PROSTATE', 'LNCAPCLONEFGC_PROSTATE', 'PC3_PROSTATE', 'VCAP_PROSTATE'], 'haematopoietic and lymphoid tissue': ['697_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'CMK_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'EOL1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'F36P_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'HDMYZ_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'HEL_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'HEL9217_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'JEKO1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'JM1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'JURKAT_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'K562_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'KARPAS299_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'KARPAS422_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'KASUMI1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'KASUMI2_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'KMS11_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'KMS12BM_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'KMS27_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'L428_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'MOLM13_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'MOLM16_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'MONOMAC1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'MONOMAC6_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'NALM6_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'NCIH929_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'NUDHL1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'OCIAML5_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'OCILY3_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'OPM2_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'RCHACV_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'REC1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'REH_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'RL_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'RPMI8226_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'SEM_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'SUDHL4_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'SUDHL6_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'TF1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'THP1_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE', 'U937_HAEMATOPOIETIC_AND_LYMPHOID_TISSUE'], 'kidney': ['769P_KIDNEY', '786O_KIDNEY', 'A498_KIDNEY', 'A704_KIDNEY', 'CAKI1_KIDNEY', 'CAKI2_KIDNEY', 'KMRC1_KIDNEY', 'KMRC20_KIDNEY', 'OSRC2_KIDNEY', 'TUHR4TKB_KIDNEY', 'VMRCRCW_KIDNEY'], 'thyroid': ['8305C_THYROID', '8505C_THYROID'], 'skin': ['A101D_SKIN', 'A2058_SKIN', 'A375_SKIN', 'C32_SKIN', 'COLO679_SKIN', 'COLO741_SKIN', 'COLO829_SKIN', 'HS294T_SKIN', 'HS695T_SKIN', 'HS944T_SKIN', 'IGR1_SKIN', 'IGR37_SKIN', 'IGR39_SKIN', 'IPC298_SKIN', 'K029AX_SKIN', 'LOXIMVI_SKIN', 'MELJUSO_SKIN', 'MEWO_SKIN', 'RPMI7951_SKIN', 'RVH421_SKIN', 'SH4_SKIN', 'SKMEL2_SKIN', 'SKMEL28_SKIN', 'SKMEL3_SKIN', 'SKMEL30_SKIN', 'SKMEL5_SKIN', 'UACC257_SKIN', 'UACC62_SKIN', 'WM115_SKIN', 'WM1799_SKIN', 'WM2664_SKIN', 'WM793_SKIN', 'WM88_SKIN'], 'central nervous system': ['A172_CENTRAL_NERVOUS_SYSTEM', 'DAOY_CENTRAL_NERVOUS_SYSTEM', 'GAMG_CENTRAL_NERVOUS_SYSTEM', 'GB1_CENTRAL_NERVOUS_SYSTEM', 'KNS42_CENTRAL_NERVOUS_SYSTEM', 'KNS81_CENTRAL_NERVOUS_SYSTEM', 'LN18_CENTRAL_NERVOUS_SYSTEM', 'LN229_CENTRAL_NERVOUS_SYSTEM', 'SF295_CENTRAL_NERVOUS_SYSTEM', 'SNB19_CENTRAL_NERVOUS_SYSTEM', 'SNU1105_CENTRAL_NERVOUS_SYSTEM', 'SW1783_CENTRAL_NERVOUS_SYSTEM', 'U118MG_CENTRAL_NERVOUS_SYSTEM', 'U87MG_CENTRAL_NERVOUS_SYSTEM'], 'soft tissue': ['A204_SOFT_TISSUE', 'G401_SOFT_TISSUE', 'G402_SOFT_TISSUE', 'HT1080_SOFT_TISSUE', 'KYM1_SOFT_TISSUE', 'RD_SOFT_TISSUE', 'RH30_SOFT_TISSUE', 'RH41_SOFT_TISSUE'], 'ovary': ['A2780_OVARY', 'CAOV3_OVARY', 'COV362_OVARY', 'FUOV1_OVARY', 'HEYA8_OVARY', 'IGROV1_OVARY', 'JHOS2_OVARY', 'KURAMOCHI_OVARY', 'NIHOVCAR3_OVARY', 'OV56_OVARY', 'OV90_OVARY', 'OVCAR4_OVARY', 'OVCAR8_OVARY', 'OVSAHO_OVARY', 'RMUGS_OVARY', 'SNU119_OVARY', 'TYKNU_OVARY'], 'lung': ['A549_LUNG', 'ABC1_LUNG', 'CALU1_LUNG', 'CALU6_LUNG', 'CHAGOK1_LUNG', 'CORL105_LUNG', 'CORL23_LUNG', 'CORL47_LUNG', 'CORL88_LUNG', 'DMS114_LUNG', 'DMS273_LUNG', 'DV90_LUNG', 'EBC1_LUNG', 'HCC15_LUNG', 'HCC1833_LUNG', 'HCC44_LUNG', 'HCC827_LUNG', 'HCC95_LUNG', 'IALM_LUNG', 'LCLC103H_LUNG', 'LK2_LUNG', 'LU65_LUNG', 'LUDLU1_LUNG', 'LXF289_LUNG', 'NCIH1048_LUNG', 'NCIH1155_LUNG', 'NCIH1299_LUNG', 'NCIH1355_LUNG', 'NCIH1435_LUNG', 'NCIH1437_LUNG', 'NCIH146_LUNG', 'NCIH1568_LUNG', 'NCIH1573_LUNG', 'NCIH1581_LUNG', 'NCIH1650_LUNG', 'NCIH1666_LUNG', 'NCIH1693_LUNG', 'NCIH1703_LUNG', 'NCIH1792_LUNG', 'NCIH1793_LUNG', 'NCIH1944_LUNG', 'NCIH196_LUNG', 'NCIH1975_LUNG', 'NCIH2009_LUNG', 'NCIH2030_LUNG', 'NCIH2066_LUNG', 'NCIH2110_LUNG', 'NCIH2122_LUNG', 'NCIH2126_LUNG', 'NCIH2170_LUNG', 'NCIH2172_LUNG', 'NCIH2228_LUNG', 'NCIH226_LUNG', 'NCIH2286_LUNG', 'NCIH2291_LUNG', 'NCIH23_LUNG', 'NCIH292_LUNG', 'NCIH3255_LUNG', 'NCIH358_LUNG', 'NCIH441_LUNG', 'NCIH446_LUNG', 'NCIH460_LUNG', 'NCIH520_LUNG', 'NCIH522_LUNG', 'NCIH647_LUNG', 'NCIH650_LUNG', 'NCIH661_LUNG', 'NCIH838_LUNG', 'PC14_LUNG', 'RERFLCMS_LUNG', 'RERFLCSQ1_LUNG', 'SBC5_LUNG', 'SHP77_LUNG', 'SKLU1_LUNG', 'SQ1_LUNG', 'SW1271_LUNG', 'SW1573_LUNG'], 'bone': ['A673_BONE', 'SAOS2_BONE', 'SJSA1_BONE', 'SKES1_BONE', 'SKNMC_BONE', 'TC71_BONE', 'U2OS_BONE'], 'stomach': ['AGS_STOMACH', 'HGC27_STOMACH', 'HUG1N_STOMACH', 'IM95_STOMACH', 'KATOIII_STOMACH', 'LMSU_STOMACH', 'MKN1_STOMACH', 'MKN45_STOMACH', 'MKN7_STOMACH', 'NCIN87_STOMACH', 'NUGC3_STOMACH', 'OCUM1_STOMACH', 'SNU1_STOMACH', 'SNU719_STOMACH'], 'pancreas': ['ASPC1_PANCREAS', 'BXPC3_PANCREAS', 'CFPAC1_PANCREAS', 'DANG_PANCREAS', 'HUPT3_PANCREAS', 'HUPT4_PANCREAS', 'KP2_PANCREAS', 'KP4_PANCREAS', 'L33_PANCREAS', 'MIAPACA2_PANCREAS', 'PANC0203_PANCREAS', 'PANC0403_PANCREAS', 'PANC1_PANCREAS', 'PATU8988T_PANCREAS', 'PL45_PANCREAS', 'QGP1_PANCREAS', 'SU8686_PANCREAS', 'SUIT2_PANCREAS', 'SW1990_PANCREAS', 'TCCPAN2_PANCREAS'], 'breast': ['AU565_BREAST', 'BT20_BREAST', 'BT549_BREAST', 'CAL120_BREAST', 'CAL51_BREAST', 'CAL851_BREAST', 'CAMA1_BREAST', 'EFM19_BREAST', 'EFM192A_BREAST', 'HCC1143_BREAST', 'HCC1187_BREAST', 'HCC1395_BREAST', 'HCC1500_BREAST', 'HCC1806_BREAST', 'HCC1937_BREAST', 'HCC1954_BREAST', 'HCC2218_BREAST', 'HCC38_BREAST', 'HCC70_BREAST', 'HDQP1_BREAST', 'JIMT1_BREAST', 'KPL1_BREAST', 'MCF7_BREAST', 'MDAMB157_BREAST', 'MDAMB231_BREAST', 'MDAMB436_BREAST', 'MDAMB453_BREAST', 'MDAMB468_BREAST', 'T47D_BREAST', 'ZR751_BREAST'], 'upper aerodigestive tract': ['BICR22_UPPER_AERODIGESTIVE_TRACT', 'BICR6_UPPER_AERODIGESTIVE_TRACT', 'CAL27_UPPER_AERODIGESTIVE_TRACT', 'CAL33_UPPER_AERODIGESTIVE_TRACT', 'DETROIT562_UPPER_AERODIGESTIVE_TRACT', 'FADU_UPPER_AERODIGESTIVE_TRACT', 'HSC3_UPPER_AERODIGESTIVE_TRACT', 'HSC4_UPPER_AERODIGESTIVE_TRACT', 'PECAPJ34CLONEC12_UPPER_AERODIGESTIVE_TRACT', 'SCC25_UPPER_AERODIGESTIVE_TRACT'], 'large intestine': ['CCK81_LARGE_INTESTINE', 'CL34_LARGE_INTESTINE', 'COLO205_LARGE_INTESTINE', 'COLO320_LARGE_INTESTINE', 'COLO678_LARGE_INTESTINE', 'HCC56_LARGE_INTESTINE', 'HCT116_LARGE_INTESTINE', 'HCT15_LARGE_INTESTINE', 'HT115_LARGE_INTESTINE', 'HT29_LARGE_INTESTINE', 'HT55_LARGE_INTESTINE', 'LS180_LARGE_INTESTINE', 'LS411N_LARGE_INTESTINE', 'LS513_LARGE_INTESTINE', 'MDST8_LARGE_INTESTINE', 'NCIH716_LARGE_INTESTINE', 'NCIH747_LARGE_INTESTINE', 'RKO_LARGE_INTESTINE', 'SKCO1_LARGE_INTESTINE', 'SNU61_LARGE_INTESTINE', 'SNUC1_LARGE_INTESTINE', 'SNUC2A_LARGE_INTESTINE', 'SNUC5_LARGE_INTESTINE', 'SW1417_LARGE_INTESTINE', 'SW403_LARGE_INTESTINE', 'SW48_LARGE_INTESTINE', 'SW480_LARGE_INTESTINE', 'SW620_LARGE_INTESTINE', 'SW837_LARGE_INTESTINE', 'SW948_LARGE_INTESTINE'], 'endometrium': ['HEC108_ENDOMETRIUM', 'HEC1A_ENDOMETRIUM', 'HEC251_ENDOMETRIUM', 'HEC265_ENDOMETRIUM', 'HEC50B_ENDOMETRIUM', 'HEC59_ENDOMETRIUM', 'HEC6_ENDOMETRIUM', 'ISHIKAWAHERAKLIO02ER_ENDOMETRIUM', 'JHUEM2_ENDOMETRIUM', 'MFE280_ENDOMETRIUM', 'MFE296_ENDOMETRIUM', 'MFE319_ENDOMETRIUM', 'SNGM_ENDOMETRIUM', 'SNU685_ENDOMETRIUM'], 'liver': ['HEP3B217_LIVER', 'HEPG2_LIVER', 'HLF_LIVER', 'HUH1_LIVER', 'HUH6_LIVER', 'HUH7_LIVER', 'JHH1_LIVER', 'JHH4_LIVER', 'JHH5_LIVER', 'JHH6_LIVER', 'JHH7_LIVER', 'SKHEP1_LIVER', 'SNU423_LIVER', 'SNU449_LIVER'], 'urinary tract': ['HT1197_URINARY_TRACT', 'HT1376_URINARY_TRACT', 'J82_URINARY_TRACT', 'JMSU1_URINARY_TRACT', 'KU1919_URINARY_TRACT', 'RT112_URINARY_TRACT', 'RT4_URINARY_TRACT', 'T24_URINARY_TRACT', 'TCCSUP_URINARY_TRACT', 'UBLC1_URINARY_TRACT', 'UMUC3_URINARY_TRACT'], 'oesophagus': ['KYSE150_OESOPHAGUS', 'KYSE180_OESOPHAGUS', 'KYSE30_OESOPHAGUS', 'KYSE410_OESOPHAGUS', 'KYSE450_OESOPHAGUS', 'KYSE510_OESOPHAGUS', 'KYSE70_OESOPHAGUS', 'OE33_OESOPHAGUS', 'TE1_OESOPHAGUS', 'TE10_OESOPHAGUS', 'TE11_OESOPHAGUS', 'TE14_OESOPHAGUS', 'TE4_OESOPHAGUS', 'TE6_OESOPHAGUS'], 'pleura': ['MSTO211H_PLEURA', 'NCIH2052_PLEURA'], 'autonomic ganglia': ['SKNAS_AUTONOMIC_GANGLIA'], 'biliary tract': ['SNU1079_BILIARY_TRACT']}
+
+		#option to add global proteomic data for a specified cell line
+		self.addGlobalProteomic=Checkbutton(self,text="Add global proteomic data from CCLE",command=self.Able_cellLine,variable=self.addGlobal,font=("Helvetica"))
+		self.addGlobalProteomic.grid(row=14,column=0)
+
+		def SpecCellLineUpdate(event):
+			if self.selectTissue_combobox.get() in listCCLE:
+				self.SpecCellLine_combobox.configure(state=NORMAL)
+				self.SpecCellLine_combobox['values'] = cellLineCCLEdico[self.selectTissue_combobox.get()]
+
+
+		self.SpecCellLine_combobox= ttk.Combobox(self,state=DISABLED,textvariable = self.Cell_line)
+		self.SpecCellLine_combobox.grid(row=14,column=3)
+
+		self.selectTissue_combobox = ttk.Combobox(self,state=DISABLED,textvariable = self.selected_tissue)
+		self.selectTissue_combobox['values'] = listCCLE
+		self.selectTissue_combobox.bind('<<ComboboxSelected>>', SpecCellLineUpdate)
+		self.selectTissue_combobox.grid(row=14,column=2)
+
 
 		self.add_overflow = Checkbutton(self, variable=self.OverflowOption,text="Add overflow (in % of the shortest path length) :", font=("Helvetica"),command=self.Able_scaleOverflow)
 		self.add_overflow.grid(row=15, column=0)
@@ -195,7 +220,7 @@ class Interface(Frame):
 		self.target_list_extraction=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.subset_targets)
 		self.target_list_extraction.grid(row=17,column=2)
 
-		self.Go_extract=Checkbutton(self,text="GO terms associated categories    :",command=self.Able_GOterm_extraction,variable=self.GOterm_extract_option,font=("Helvetica"))
+		self.Go_extract=Checkbutton(self,text="GO terms associated categories:",command=self.Able_GOterm_extraction,variable=self.GOterm_extract_option,font=("Helvetica"))
 		self.Go_extract.grid(row=18,column=0)  
 
 		self.yDefilCat = Scrollbar(self, orient='vertical')
@@ -215,16 +240,12 @@ class Interface(Frame):
 		#
 		self.submit.grid(row=19,column=0)
 
-
-
-
-
 	#Function to select file
-	def cliquerFile(self):        
+	def cliquerFile(self):
 		self.filename =  filedialog.askopenfilename(initialdir = "/HOME",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
 		self.labelFile.configure(text=self.filename)
 	#function to select folder	
-	def cliquerFolder(self):        
+	def cliquerFolder(self):
 		self.work_folder =  filedialog.askdirectory(initialdir = "/HOME",title = "Select folder")   
 		self.labelFolder.configure(text=self.work_folder)	
 
@@ -246,6 +267,13 @@ class Interface(Frame):
 			self.SpecModOption_list.configure(state=NORMAL) 
 		else:
 			self.SpecModOption_list.configure(state=DISABLED)
+	
+	def Able_cellLine(self):
+		if self.addGlobal.get()==1:
+			self.selectTissue_combobox.configure(state=NORMAL)
+		else:
+			self.selectTissue_combobox.configure(state=DISABLED)
+			self.SpecCellLine_combobox.configure(state=DISABLED)
 
 	def Able_scaleOverflow(self):
 		if self.OverflowOption.get()==1:
@@ -263,7 +291,7 @@ class Interface(Frame):
 		if self.GOterm_extract_option.get()==1:
 			self.GO_list_extraction.configure(state=NORMAL) 
 		else:
-			self.GO_list_extraction.configure(state=DISABLED)       
+			self.GO_list_extraction.configure(state=DISABLED)   
 	###############################################################################""
 
 
@@ -272,6 +300,8 @@ class Interface(Frame):
 	def cliquerSubmit(self):
 		self.KinPhos_mod=self.KinPhos_list.curselection()
 		self.CatExtraction=self.GO_list_extraction.curselection()
+		print(self.selected_tissue.get())
+		print(self.Cell_line.get())
 		if self.checkFormular() ==1:
 			fenetre.destroy()
 		else:
@@ -329,6 +359,18 @@ class Interface(Frame):
 		else:
 			self.SpecModOption.config(fg='black')
 
+		if self.addGlobal.get()==1 and self.selected_tissue.get()=="":
+			self.addGlobalProteomic.config(fg='red')
+			self.check=0
+		else:
+			self.addGlobalProteomic.config(fg='black')
+
+		if self.addGlobal.get()==1 and self.Cell_line.get()=="":
+			self.addGlobalProteomic.config(fg='red')
+			self.check=0
+		else:
+			self.addGlobalProteomic.config(fg='black')
+
 		if self.OverflowOption.get()==1 and self.overflowValue.get()==0:
 			self.add_overflow.config(fg='red')
 			self.check=0
@@ -354,6 +396,7 @@ class Interface(Frame):
 
 fenetre = Tk()
 fenetre.title("Phos2Net")
+#fenetre.config(background='#41B77F')
 #img = fenetre.Image("photo", file="LogoPhos2Net.png")
 img = Image("photo", file="LogoPhos2Net.gif")
 fenetre.tk.call('wm','iconphoto',fenetre._w, img)
