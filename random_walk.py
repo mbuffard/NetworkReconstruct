@@ -21,7 +21,6 @@ def get_adjacency_matrix(edge_file, nodeList):
             id1Index = nodeList.index(lineList[0].strip())
             id2Index = nodeList.index(lineList[2].strip())
             adjacency[id1Index, id2Index] = lineList[1]
-            adjacency[id2Index, id1Index] = lineList[1]
 
     return(adjacency)
 
@@ -53,19 +52,19 @@ def get_node_score(node_file):
 
 def random_walk_with_restart(adjacency, p_0, restart, max_nb_iter, convergence_cutoff):
 
-    # matrice d'adjacence normalisée par colonne
+    # Creation of the column-normalized adjacency matrix
     for row in range(0, adjacency.shape[1]):
         divisor = sum(adjacency[:,row])
         for line in range(0, adjacency.shape[0]):
             adjacency[line,row] = adjacency[line,row]/divisor
     
-    # Assignation des probabilités
+    # Assign equal probabilities to seed nodes
     p_0 = p_0/sum(p_0)
 
-    # Initialisation du vecteur p_t
+    # p_t vector initialisation
     p_t = p_0
     
-    # Itération pour calculer le vecteur de probabilité
+    # Iterate till convergence is met or max_n_iter is exceeded
     for iteration in range(1,max_nb_iter+1):
         p_tx = (1-restart)*numpy.dot(adjacency, p_t) + restart*p_0
         if linalg.norm(p_tx-p_t) < convergence_cutoff:
