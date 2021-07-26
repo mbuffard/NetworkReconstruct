@@ -8,8 +8,6 @@ import fisher
 import networkx as nx
 
 
-
-
 def rank(targets, pathways, allmembers, outname):
     P = len(allmembers)
     realtargets = targets.intersection(allmembers)
@@ -97,9 +95,11 @@ def merge_ranks(outfolder, targetfiles, outname):
 
 
 #to do add selection mode option
-def build_network(rank_file, network_file_name, targets,cachedir,selection_mode):
+def build_network(rank_file, network_file_name, targets,cachedir,selection_mode,outfolder,filename):
     network_file = "%s.tsv" % network_file_name
     nodes_file = "%s_nodes.tsv" % network_file_name
+    selected_paths_name=os.path.join(outfolder, "%s__selected_pathways.tsv" % filename)
+    selected_paths=open(selected_paths_name,'w')
     ranked = []
     f = open(rank_file)
     for line in f:
@@ -123,11 +123,10 @@ def build_network(rank_file, network_file_name, targets,cachedir,selection_mode)
                     continue
             merge_pathway_in_network(net, pid,cachedir)
             covered.update(members)
+            selected_paths.write(pid+"\t"+str(score)+"\n")
         if selection_mode==2:
             merge_pathway_in_network(net, pid,cachedir)
             covered.update(members)
-
-
 
     
     out = open(network_file, 'w')

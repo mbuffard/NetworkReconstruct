@@ -28,6 +28,7 @@ max_n_iter<-50
 # Parameter r: convergence cutoff 
 convergence_cutoff<-1e-6
 
+
 main<-function() {
     args = commandArgs(trailingOnly=T)
     node_file = args[1]

@@ -4,8 +4,6 @@ from tkinter.messagebox import *
 from tkinter import ttk
 
 
-
-
 class Interface(Frame):
 	
 	"""Notre fenêtre principale.
@@ -21,6 +19,7 @@ class Interface(Frame):
 		self.addKinPhos=IntVar() 
 		self.addSpecMod=IntVar() 
 		self.addGlobal=IntVar()
+		self.DemoteCCLEOption=IntVar()
 		self.OverflowOption=IntVar()
 		self.overflowValue =IntVar()
 		self.target_extract_option=IntVar()
@@ -28,7 +27,8 @@ class Interface(Frame):
 		self.source=StringVar()   
 		self.subs=StringVar()
 		self.Mod_list=StringVar()
-		self.Cell_line=StringVar()
+		self.selected_tissue=StringVar()
+		self.Cell_line=[]
 		self.KinPhos_mod=[]
 		self.subset_targets=StringVar()
 		self.selection=IntVar()
@@ -40,8 +40,6 @@ class Interface(Frame):
 
 		Frame.__init__(self, fenetre, width=768, height=576, **kwargs)
 		self.pack(fill=BOTH)
-		#todo nicer windows
-		#self.config(background='#41B77F')
 
 		self.frame1=Frame(self,relief=GROOVE)
 		self.frame1.grid(row=0, column=2, columnspan=3, rowspan=19)
@@ -142,7 +140,7 @@ class Interface(Frame):
 
 		#Add weights
 		self.WeightLabel=Label(self,text="Weight the edges, enter list of :",font=("Helvetica"))
-		self.WeightLabel.grid(row=11,column=0,columnspan=2,pady=5)
+		self.WeightLabel.grid(row=11,column=0,columnspan=1,pady=5)
 
 		self.label_docWeight=Label(self,text='?',font=("Helvetica", ))
 		self.label_docWeight.grid(row=11, column=0, sticky='e')
@@ -171,50 +169,134 @@ class Interface(Frame):
 		self.SpecModOption_list=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.Mod_list)
 		self.SpecModOption_list.grid(row=13,column=2)
 
+		listCCLE = ['autonomic ganglia', 'biliary tract', 'bone', 'breast', 'central nervous system', 'endometrium', 'haematopoietic and lymphoid tissue', 'kidney', 'large intestine', 'liver', 'lung', 'oesophagus', 'ovary', 'pancreas', 'pleura', 'prostate', 'skin', 'soft tissue', 'stomach', 'thyroid', 'upper aerodigestive tract', 'urinary tract']
+		cellLineCCLEdico = {'prostate': ['22RV1', 'DU145', 'LNCAPCLONEFGC', 'PC3', 'VCAP'], 'haematopoietic and lymphoid tissue': ['697', 'CMK', 'EOL1', 'F36P', 'HDMYZ', 'HEL', 'HEL9217', 'JEKO1', 'JM1', 'JURKAT', 'K562', 'KARPAS299', 'KARPAS422', 'KASUMI1', 'KASUMI2', 'KMS11', 'KMS12BM', 'KMS27', 'L428', 'MOLM13', 'MOLM16', 'MONOMAC1', 'MONOMAC6', 'NALM6', 'NCIH929', 'NUDHL1', 'OCIAML5', 'OCILY3', 'OPM2', 'RCHACV', 'REC1', 'REH', 'RL', 'RPMI8226', 'SEM', 'SUDHL4', 'SUDHL6', 'TF1', 'THP1', 'U937'], 'kidney': ['769P', '786O', 'A498', 'A704', 'CAKI1', 'CAKI2', 'KMRC1', 'KMRC20', 'OSRC2', 'TUHR4TKB', 'VMRCRCW'], 'thyroid': ['8305C', '8505C'], 'skin': ['A101D', 'A2058', 'A375', 'C32', 'COLO679', 'COLO741', 'COLO829', 'HS294T', 'HS695T', 'HS944T', 'IGR1', 'IGR37', 'IGR39', 'IPC298', 'K029AX', 'LOXIMVI', 'MELJUSO', 'MEWO', 'RPMI7951', 'RVH421', 'SH4', 'SKMEL2', 'SKMEL28', 'SKMEL3', 'SKMEL30', 'SKMEL5', 'UACC257', 'UACC62', 'WM115', 'WM1799', 'WM2664', 'WM793', 'WM88'], 'central nervous system': ['A172', 'DAOY', 'GAMG', 'GB1', 'KNS42', 'KNS81', 'LN18', 'LN229', 'SF295', 'SNB19', 'SNU1105', 'SW1783', 'U118MG', 'U87MG'], 'soft tissue': ['A204', 'G401', 'G402', 'HT1080', 'KYM1', 'RD', 'RH30', 'RH41'], 'ovary': ['A2780', 'CAOV3', 'COV362', 'FUOV1', 'HEYA8', 'IGROV1', 'JHOS2', 'KURAMOCHI', 'NIHOVCAR3', 'OV56', 'OV90', 'OVCAR4', 'OVCAR8', 'OVSAHO', 'RMUGS', 'SNU119', 'TYKNU'], 'lung': ['A549', 'ABC1', 'CALU1', 'CALU6', 'CHAGOK1', 'CORL105', 'CORL23', 'CORL47', 'CORL88', 'DMS114', 'DMS273', 'DV90', 'EBC1', 'HCC15', 'HCC1833', 'HCC44', 'HCC827', 'HCC95', 'IALM', 'LCLC103H', 'LK2', 'LU65', 'LUDLU1', 'LXF289', 'NCIH1048', 'NCIH1155', 'NCIH1299', 'NCIH1355', 'NCIH1435', 'NCIH1437', 'NCIH146', 'NCIH1568', 'NCIH1573', 'NCIH1581', 'NCIH1650', 'NCIH1666', 'NCIH1693', 'NCIH1703', 'NCIH1792', 'NCIH1793', 'NCIH1944', 'NCIH196', 'NCIH1975', 'NCIH2009', 'NCIH2030', 'NCIH2066', 'NCIH2110', 'NCIH2122', 'NCIH2126', 'NCIH2170', 'NCIH2172', 'NCIH2228', 'NCIH226', 'NCIH2286', 'NCIH2291', 'NCIH23', 'NCIH292', 'NCIH3255', 'NCIH358', 'NCIH441', 'NCIH446', 'NCIH460', 'NCIH520', 'NCIH522', 'NCIH647', 'NCIH650', 'NCIH661', 'NCIH838', 'PC14', 'RERFLCMS', 'RERFLCSQ1', 'SBC5', 'SHP77', 'SKLU1', 'SQ1', 'SW1271', 'SW1573'], 'bone': ['A673', 'SAOS2', 'SJSA1', 'SKES1', 'SKNMC', 'TC71', 'U2OS'], 'stomach': ['AGS', 'HGC27', 'HUG1N', 'IM95', 'KATOIII', 'LMSU', 'MKN1', 'MKN45', 'MKN7', 'NCIN87', 'NUGC3', 'OCUM1', 'SNU1', 'SNU719'], 'pancreas': ['ASPC1', 'BXPC3', 'CFPAC1', 'DANG', 'HUPT3', 'HUPT4', 'KP2', 'KP4', 'L33', 'MIAPACA2', 'PANC0203', 'PANC0403', 'PANC1', 'PATU8988T', 'PL45', 'QGP1', 'SU8686', 'SUIT2', 'SW1990', 'TCCPAN2'], 'breast': ['AU565', 'BT20', 'BT549', 'CAL120', 'CAL51', 'CAL851', 'CAMA1', 'EFM19', 'EFM192A', 'HCC1143', 'HCC1187', 'HCC1395', 'HCC1500', 'HCC1806', 'HCC1937', 'HCC1954', 'HCC2218', 'HCC38', 'HCC70', 'HDQP1', 'JIMT1', 'KPL1', 'MCF7', 'MDAMB157', 'MDAMB231', 'MDAMB436', 'MDAMB453', 'MDAMB468', 'T47D', 'ZR751'], 'upper aerodigestive tract': ['BICR22', 'BICR6', 'CAL27', 'CAL33', 'DETROIT562', 'FADU', 'HSC3', 'HSC4', 'PECAPJ34CLONEC12', 'SCC25'], 'large intestine': ['CCK81', 'CL34', 'COLO205', 'COLO320', 'COLO678', 'HCC56', 'HCT116', 'HCT15', 'HT115', 'HT29', 'HT55', 'LS180', 'LS411N', 'LS513', 'MDST8', 'NCIH716', 'NCIH747', 'RKO', 'SKCO1', 'SNU61', 'SNUC1', 'SNUC2A', 'SNUC5', 'SW1417', 'SW403', 'SW48', 'SW480', 'SW620', 'SW837', 'SW948'], 'endometrium': ['HEC108', 'HEC1A', 'HEC251', 'HEC265', 'HEC50B', 'HEC59', 'HEC6', 'ISHIKAWAHERAKLIO02ER', 'JHUEM2', 'MFE280', 'MFE296', 'MFE319', 'SNGM', 'SNU685'], 'liver': ['HEP3B217', 'HEPG2', 'HLF', 'HUH1', 'HUH6', 'HUH7', 'JHH1', 'JHH4', 'JHH5', 'JHH6', 'JHH7', 'SKHEP1', 'SNU423', 'SNU449'], 'urinary tract': ['HT1197', 'HT1376', 'J82', 'JMSU1', 'KU1919', 'RT112', 'RT4', 'T24', 'TCCSUP', 'UBLC1', 'UMUC3'], 'oesophagus': ['KYSE150', 'KYSE180', 'KYSE30', 'KYSE410', 'KYSE450', 'KYSE510', 'KYSE70', 'OE33', 'TE1', 'TE10', 'TE11', 'TE14', 'TE4', 'TE6'], 'pleura': ['MSTO211H', 'NCIH2052'], 'autonomic ganglia': ['SKNAS'], 'biliary tract': ['SNU1079']}
+
+	
 		#option to add global proteomic data for a specified cell line
-		self.addGlobalProteomic=Checkbutton(self,text="Add global proteomic data from CCLE",command=self.Able_cellLine,variable=self.addGlobal,font=("Helvetica"))
+		self.addGlobalProteomic=Checkbutton(self,text="Add global proteomic data from CCLE :",command=self.Able_cellLine,variable=self.addGlobal,font=("Helvetica"))
 		self.addGlobalProteomic.grid(row=14,column=0)
-		
-		self.SpecCellLine_list=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.Cell_line)
-		self.SpecCellLine_list.grid(row=14,column=2)
+
+		# Documentation
+		self.label_docCCLEoption=Label(self,text='?',font=("Helvetica", ))
+		self.label_docCCLEoption.grid(row=14, column=0, sticky='e')
+		self.label_docCCLEoption.bind('<Enter>', lambda event, text='The CCLE option will take in account the protein expression in the selected cell line to reconstruct the network': add_Tooltip(self.label_docCCLEoption,text))
+		self.label_docCCLEoption.bind('<Leave>', lambda event :destroy_Tooltip(self))
+
+		# Definition of list of cell lines in listbox once tissue has been selected
+		def SpecCellLineUpdate(event):
+			if self.selectTissue_combobox.get() in listCCLE:
+				self.SpecCellLine_entry.configure(state=NORMAL)
+				self.SpecCellLine_list.configure(state=NORMAL)
+				self.SpecCellLine_entry_label.configure(state=NORMAL)
+				self.SpecCellLine_list_label.configure(state=NORMAL)
+				self.SpecCellLine_list.delete(0, 'end')
+				for cellLine in cellLineCCLEdico[self.selectTissue_combobox.get()]:
+					self.SpecCellLine_list.insert(END,cellLine)
+
+		# Modificationn of list of cell line in listbox according to submitted value
+		def SpecCellLine_keyrelease(event):
+			value = event.widget.get()
+			value = value.strip().lower()
+			self.tissue = self.selectTissue_combobox.get()
+			if value == '':
+				data = cellLineCCLEdico[self.tissue]
+			else:
+				data = []
+				for item in cellLineCCLEdico[self.tissue]:
+					if item.lower().startswith(value):
+						data.append(item)   
+			# update data in listbox
+			SpecCellLine_listbox_update(data)
+
+		# Modification of list of cell lines in listbox according to submitted value in entrybox
+		def SpecCellLine_listbox_update(data):
+			# delete previous data
+			self.SpecCellLine_list.delete(0, 'end')
+			if data:
+				# sorting data 
+				data = sorted(data, key=str.lower)
+				# put new data
+				for item in data:
+					self.SpecCellLine_list.insert('end', item)
+			else:
+				self.SpecCellLine_list.insert('end','Not found')
+
+		# Activation of check button Demote proteins once selected cell line has been validated
+		def SpecCellLineDemote(event):
+			self.tissue = self.selectTissue_combobox.get()
+			if self.SpecCellLine_list.get(0) in cellLineCCLEdico[self.tissue]:
+				self.demote_option.configure(state=NORMAL)
+
+
+		# Entry widget to submit cell line
+		self.SpecCellLine_entry=Entry(self,state=DISABLED,font=("Helvetica"))
+		self.SpecCellLine_entry.grid(row=16,column=2)
+		self.SpecCellLine_entry.bind('<KeyRelease>', SpecCellLine_keyrelease)
+		self.SpecCellLine_entry_label=Label(self,text='Type to help to find a cell line:',font=("Helvetica"),state=DISABLED)
+		self.SpecCellLine_entry_label.grid(row=16,column=0)
+
+		self.SpecCellDefilB = Scrollbar(self, orient='vertical')
+		self.SpecCellDefilB.grid(row=17, column=3, sticky='ns' )
+
+		# Listbox widget to select cell line
+		self.SpecCellLine_list = Listbox(self,font=("Helvetica"),selectmode=SINGLE,yscrollcommand=self.SpecCellDefilB.set,exportselection=0)
+		self.SpecCellLine_list.grid(row=17,column=2)
+		self.SpecCellLine_list.bind('<<ListboxSelect>>', SpecCellLineDemote)
+		self.SpecCellLine_list_label=Label(self,text='Choose a cell line :',font=("Helvetica"),state=DISABLED)
+		self.SpecCellLine_list_label.grid(row=17,column=0)
+		self.SpecCellLine_list.config(width=20,height=2,state=DISABLED)
+
+		# Combobox to select tissue
+		self.selectTissue_combobox = ttk.Combobox(self,state=DISABLED,textvariable = self.selected_tissue)
+		self.selectTissue_combobox['values'] = listCCLE
+		self.selectTissue_combobox.bind('<<ComboboxSelected>>', SpecCellLineUpdate)
+		self.selectTissue_combobox.grid(row=15,column=2)
+
+		self.selectTissue_label=Label(self,text='Choose a tissue :',font=("Helvetica"),state=DISABLED)
+		self.selectTissue_label.grid(row=15,column=0)
+
+		# Check button to demote or not proteins
+		self.demote_option= Checkbutton(self, variable=self.DemoteCCLEOption,text="Demote unidentified proteins from CCLE", font=("Helvetica"),state=DISABLED)
+		self.demote_option.grid(row=18, column=0)
 
 
 		self.add_overflow = Checkbutton(self, variable=self.OverflowOption,text="Add overflow (in % of the shortest path length) :", font=("Helvetica"),command=self.Able_scaleOverflow)
-		self.add_overflow.grid(row=15, column=0)
+		self.add_overflow.grid(row=19, column=0)
 
-		self.label_docOverflow=Label(self,text='?',font=("Helvetica", ))
-		self.label_docOverflow.grid(row=15, column=0, sticky='e')
+		self.label_docOverflow=Label(self,text='?',font=("Helvetica"))
+		self.label_docOverflow.grid(row=19, column=1)
 		self.label_docOverflow.bind('<Enter>', lambda event, text='The "overflow option" will display extra networks\n with alternative paths with a percentage of shortest path extra length.': add_Tooltip(self.label_docOverflow,text))
 		self.label_docOverflow.bind('<Leave>', lambda event :destroy_Tooltip(self))
 
 		self.overflow=Scale(self,state=DISABLED,orient=HORIZONTAL,width=30,length=300,variable=self.overflowValue)
-		self.overflow.grid(row=15,column=2)
+		self.overflow.grid(row=19,column=2)
 
 		#Network extraction
 		self.ExtractionLabel=Label(self,text="Network extraction, enter list of :",font=("Helvetica"))
-		self.ExtractionLabel.grid(row=16,column=0,columnspan=2,pady=5)
+		self.ExtractionLabel.grid(row=20,column=0,columnspan=1,pady=5)
 
 		self.label_docExtraction=Label(self,text='?',font=("Helvetica", ))
-		self.label_docExtraction.grid(row=16, column=0, sticky='e')
+		self.label_docExtraction.grid(row=20, column=0, sticky='e')
 		self.label_docExtraction.bind('<Enter>', lambda event, text='The "extraction option" will display the sub-networks focusing on a subset of targets. \nThese targets can be selected based on GO term associated categories \nand or a specified subset of targets.': add_Tooltip(self.label_docExtraction,text))
 		self.label_docExtraction.bind('<Leave>', lambda event :destroy_Tooltip(self))
 
 
 
 		self.targets=Checkbutton(self,text="Subset of target(s) :",command=self.Able_target_extraction,variable=self.target_extract_option,font=("Helvetica"))
-		self.targets.grid(row=17,column=0)  
+		self.targets.grid(row=21,column=0)  
 
 		self.target_list_extraction=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.subset_targets)
-		self.target_list_extraction.grid(row=17,column=2)
+		self.target_list_extraction.grid(row=21,column=2)
 
-		self.Go_extract=Checkbutton(self,text="GO terms associated categories    :",command=self.Able_GOterm_extraction,variable=self.GOterm_extract_option,font=("Helvetica"))
-		self.Go_extract.grid(row=18,column=0)  
+		self.Go_extract=Checkbutton(self,text="GO terms associated categories:",command=self.Able_GOterm_extraction,variable=self.GOterm_extract_option,font=("Helvetica"))
+		self.Go_extract.grid(row=22,column=0)  
 
 		self.yDefilCat = Scrollbar(self, orient='vertical')
-		self.yDefilCat.grid(row=18, column=3, sticky='ns' )
+		self.yDefilCat.grid(row=22, column=3, sticky='ns' )
 
 		self.GO_list_extraction=Listbox(self,selectmode=MULTIPLE,font=("Helvetica"),yscrollcommand=self.yDefilCat.set,exportselection=0)
-		self.GO_list_extraction.grid(row=18,column=2)
+		self.GO_list_extraction.grid(row=22,column=2)
 
 		self.yDefilCat['command'] = self.GO_list_extraction.yview
 		for item in ["cell adhesion and motility","cell growth and death","cell transport and metabolism", "immune system and inflammation","cell differentiation"]:
@@ -225,18 +307,14 @@ class Interface(Frame):
 		#submit button
 		self.submit=Button(self, text="Submit", font=("Helvetica"),command=self.cliquerSubmit,)
 		#
-		self.submit.grid(row=19,column=0)
-
-
-
-
+		self.submit.grid(row=23,column=0)
 
 	#Function to select file
-	def cliquerFile(self):        
+	def cliquerFile(self):
 		self.filename =  filedialog.askopenfilename(initialdir = "/HOME",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
 		self.labelFile.configure(text=self.filename)
 	#function to select folder	
-	def cliquerFolder(self):        
+	def cliquerFolder(self):
 		self.work_folder =  filedialog.askdirectory(initialdir = "/HOME",title = "Select folder")   
 		self.labelFolder.configure(text=self.work_folder)	
 
@@ -261,9 +339,20 @@ class Interface(Frame):
 	
 	def Able_cellLine(self):
 		if self.addGlobal.get()==1:
-			self.SpecCellLine_list.configure(state=NORMAL)
+			self.selectTissue_combobox.configure(state=NORMAL)
+			self.selectTissue_label.configure(state=NORMAL)
 		else:
+			self.selectTissue_combobox.configure(state=DISABLED)
+			self.selectTissue_label.configure(state=DISABLED)
+			self.SpecCellLine_entry.configure(state=DISABLED)
 			self.SpecCellLine_list.configure(state=DISABLED)
+			self.demote_option.configure(state=DISABLED)
+			self.selectTissue_combobox.selection_clear()
+			self.SpecCellLine_list.selection_clear(0)
+			self.demote_option.deselect()
+			self.selected_tissue.get()==""
+			self.Cell_line=[]
+			self.DemoteCCLEOption=0
 
 	def Able_scaleOverflow(self):
 		if self.OverflowOption.get()==1:
@@ -281,7 +370,7 @@ class Interface(Frame):
 		if self.GOterm_extract_option.get()==1:
 			self.GO_list_extraction.configure(state=NORMAL) 
 		else:
-			self.GO_list_extraction.configure(state=DISABLED)       
+			self.GO_list_extraction.configure(state=DISABLED)   
 	###############################################################################""
 
 
@@ -290,6 +379,7 @@ class Interface(Frame):
 	def cliquerSubmit(self):
 		self.KinPhos_mod=self.KinPhos_list.curselection()
 		self.CatExtraction=self.GO_list_extraction.curselection()
+		self.Cell_line=self.SpecCellLine_list.curselection()
 		if self.checkFormular() ==1:
 			fenetre.destroy()
 		else:
@@ -347,11 +437,22 @@ class Interface(Frame):
 		else:
 			self.SpecModOption.config(fg='black')
 
-		if self.addGlobal.get()==1 and self.Cell_line.get()=="":
-			self.SpecCellLine_list.config(fg='red')
+		if self.addGlobal.get()==1 and self.selected_tissue.get()=="":
+			self.addGlobalProteomic.config(fg='red')
+			self.selectTissue_label.config(fg='red')
 			self.check=0
 		else:
-			self.SpecCellLine_list.config(fg='black')
+			self.addGlobalProteomic.config(fg='black')
+
+		if self.addGlobal.get()==1 and not self.Cell_line:
+			self.addGlobalProteomic.config(fg='red')
+			self.SpecCellLine_list_label.config(fg='red')
+			self.check=0
+		else:
+			self.addGlobalProteomic.config(fg='black')
+
+		if self.addGlobal.get()==1 and self.Cell_line and self.selected_tissue.get()!="":
+			self.cell_line=self.SpecCellLine_list.get(self.Cell_line[0])+"_"+self.selected_tissue.get().upper()
 
 		if self.OverflowOption.get()==1 and self.overflowValue.get()==0:
 			self.add_overflow.config(fg='red')
@@ -371,10 +472,7 @@ class Interface(Frame):
 		else:
 			self.Go_extract.config(fg='black')
 
-		return self.check   
-
-
-
+		return self.check 
 
 fenetre = Tk()
 fenetre.title("Phos2Net")
@@ -383,6 +481,8 @@ fenetre.title("Phos2Net")
 img = Image("photo", file="LogoPhos2Net.gif")
 fenetre.tk.call('wm','iconphoto',fenetre._w, img)
 interface = Interface(fenetre)
+
+
 
 interface.mainloop()
 '''

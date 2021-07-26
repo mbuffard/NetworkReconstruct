@@ -15,6 +15,7 @@ from os.path import basename
 from GUI import interface
 from tkinter import ttk
 from datetime import datetime
+import time
 
 
 ####################################################################################################################################################################
@@ -22,8 +23,7 @@ from datetime import datetime
 # new options and GUI have been added
 ################################################################################################################################################################""
 
-
-
+Phos2NetStart = time.time()
 
 if interface.check==0:
 	exit()
@@ -106,11 +106,20 @@ log_file.write("===================\n")
 #load global proteomic data
 globalProteomic=set()
 if interface.addGlobal.get()==1:
-	cell_line=interface.Cell_line.get()
+	cell_line=interface.cell_line
 	globalProteomic=global_prot.extractData(cell_line)
 	globalProtData=1
+	log_file.write("CCLE option activated\n")
+	log_file.write("Selected cell line :\n")
+	log_file.write(cell_line+"\n")
+	if interface.DemoteCCLEOption.get()==1:
+		log_file.write("Unidentified proteins have been demoted\n")
+	else:
+		log_file.write("Unidentified proteins have not been demoted\n")
+
 else:
 	globalProtData=0
+
 #####################################################################################################
 
 # the groups of GO terms of interest
@@ -198,12 +207,13 @@ pathways, allmembers = load_pathways(members)
 rank(targets, pathways, allmembers, rank_file)
 
 #add selection mode option
+log_file.write("===================\n")
 log_file.write("selection mode : \n")
 if interface.selection.get()==1:
-	build_network(rank_file, network_file_name, targets,cachedir,1)
+	build_network(rank_file, network_file_name, targets,cachedir,1,outfolder,filename)
 	log_file.write("enriched pathways\n")
 if interface.selection.get()==2:
-	build_network(rank_file, network_file_name, targets,cachedir,2)
+	build_network(rank_file, network_file_name, targets,cachedir,2,outfolder,filename)
 	log_file.write("all pathways \n")
 log_file.write("===================\n")
 
@@ -220,6 +230,7 @@ if interface.addSubstOption.get()==1:
 		subs=converter.handler.clean_uid(subs)
 		log_file.write(subs+"\t")
 		targets.add(subs)
+	log_file.write("\n===================\n")
 
 
 ##########################
@@ -286,10 +297,7 @@ f.close()
 
 ############################################# For all targets (all nodes....)###########################################
 # Add the weights and build the graph for path search
-if interface.addGlobal.get()==1:
-	interactions=add_weights('%s.tsv' % network_file_name,globalProt_score)
-else:
-	interactions = add_weights('%s.tsv' % network_file_name, ptyr_score)
+interactions = add_weights('%s.tsv' % network_file_name, ptyr_score)
 G = nearshortest.load_interactions(interactions)
 
 ranks = nearshortest.rank_paths(G, source)
@@ -302,11 +310,18 @@ nearshortest.save_graph(reachable, os.path.join(outfolder, "reachable.tsv"))
 # Launch the random walk to refine the weights
 Gs = nearshortest.random_walk(reachable, get_rate, source, rpath)
 
+# Change the edge weight when CCLE option is activated
+if (interface.addGlobal.get()==1 and interface.DemoteCCLEOption.get()==1):
+	for node_source, node_target, data in Gs.edges(data=True):
+		if node_source not in globalProteomic:
+			data['weight']=50
+		else:
+			if node_target not in globalProteomic:
+				data['weight']=50
+
 # Compute shortest paths on network after random walk
 ranks_rdm = nearshortest.rank_paths(Gs, source)
-reachable_rdm = Gs.subgraph(ranks_rdm)
-
-
+reachable_rdm = G.subgraph(ranks_rdm)
 
 ############################################################################################################################
 # Reconstruct shortest paths to specified sets of targets (go associated), targets need to be in a file with the uniprot
@@ -397,8 +412,11 @@ for tfile in os.listdir(target_files_folder):
 
 ##############################################################################################################################################""
 
+Phos2NetEnd = time.time()
 
-
+log_file.write("===================\n")
+log_file.write("Total duration:\n")
+log_file.write(str(Phos2NetEnd-Phos2NetStart)+"\n")
 
 
 fenetre = Tk()
