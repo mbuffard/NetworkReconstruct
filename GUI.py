@@ -345,14 +345,16 @@ class Interface(Frame):
 			self.selectTissue_combobox.configure(state=DISABLED)
 			self.selectTissue_label.configure(state=DISABLED)
 			self.SpecCellLine_entry.configure(state=DISABLED)
+			self.SpecCellLine_entry_label.configure(state=DISABLED)
 			self.SpecCellLine_list.configure(state=DISABLED)
+			self.SpecCellLine_list_label.configure(state=DISABLED)
 			self.demote_option.configure(state=DISABLED)
 			self.selectTissue_combobox.selection_clear()
 			self.SpecCellLine_list.selection_clear(0)
 			self.demote_option.deselect()
 			self.selected_tissue.get()==""
 			self.Cell_line=[]
-			self.DemoteCCLEOption=0
+			self.DemoteCCLEOption.get()==0
 
 	def Able_scaleOverflow(self):
 		if self.OverflowOption.get()==1:
