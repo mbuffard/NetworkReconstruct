@@ -133,10 +133,8 @@ def save_graph(G, filename):
             out.write('%s\t%s\t%s\n' % (source,target,w))
 
 def random_walk(G, helper, source, rpath):
-    "Refine the weights of all arcs after running a random walk (external R code)"
-    debut = time.time()
-    print('Debut Random Walk :')
-    print(debut)
+    "Refine the weights of all arcs after running a random walk"
+
     filename = os.path.join(rpath,'network')
     f_nodes = '%s_nodes.tsv' % filename
     f_wedges = '%s_wedges.tsv' % filename
@@ -181,12 +179,6 @@ def random_walk(G, helper, source, rpath):
 
     Gs = nx.DiGraph()
     Gs.add_weighted_edges_from(scaled_arcs)
-    
-    fin = time.time()
-    print('Fin Random Walk :')
-    print(fin)
-    print('Duree Random Walk (en s) :')
-    print(fin - debut)
     
     return Gs
     

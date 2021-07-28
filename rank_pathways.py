@@ -16,8 +16,7 @@ def rank(targets, pathways, allmembers, outname):
     
     # score it all
     out = open(outname, 'w')
-    depart = time.time()
-    print(depart)
+
     for uid,name,members in pathways:
         pmembers = members.intersection(realtargets)
         pmember_names = [ converter.handler.to_symbol(uid) for uid in pmembers ]
@@ -37,10 +36,6 @@ def rank(targets, pathways, allmembers, outname):
         out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
         
     out.close()
-    
-    fin = time.time()
-    print(fin)
-    print("--- %s seconds ---" % (fin - depart))
 
 def load_pathways(membersfile):
     f = open(membersfile)
