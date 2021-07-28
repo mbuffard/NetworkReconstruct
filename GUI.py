@@ -19,9 +19,7 @@ class Interface(Frame):
 		self.addKinPhos=IntVar() 
 		self.addSpecMod=IntVar() 
 		self.addGlobal=IntVar()
-
 		self.DemoteCCLEOption=IntVar()
-
 		self.OverflowOption=IntVar()
 		self.overflowValue =IntVar()
 		self.target_extract_option=IntVar()
@@ -30,9 +28,7 @@ class Interface(Frame):
 		self.subs=StringVar()
 		self.Mod_list=StringVar()
 		self.selected_tissue=StringVar()
-
 		self.Cell_line=[]
-
 		self.KinPhos_mod=[]
 		self.subset_targets=StringVar()
 		self.selection=IntVar()
@@ -44,8 +40,6 @@ class Interface(Frame):
 
 		Frame.__init__(self, fenetre, width=768, height=576, **kwargs)
 		self.pack(fill=BOTH)
-		#todo nicer windows
-		#self.config(background='#41B77F')
 
 		self.frame1=Frame(self,relief=GROOVE)
 		self.frame1.grid(row=0, column=2, columnspan=3, rowspan=19)
@@ -188,11 +182,8 @@ class Interface(Frame):
 		self.label_docCCLEoption.grid(row=14, column=0, sticky='e')
 		self.label_docCCLEoption.bind('<Enter>', lambda event, text='The CCLE option will take in account the protein expression in the selected cell line to reconstruct the network': add_Tooltip(self.label_docCCLEoption,text))
 		self.label_docCCLEoption.bind('<Leave>', lambda event :destroy_Tooltip(self))
-	
-		#option to add global proteomic data for a specified cell line
-		self.addGlobalProteomic=Checkbutton(self,text="Add global proteomic data from CCLE",command=self.Able_cellLine,variable=self.addGlobal,font=("Helvetica"))
-		self.addGlobalProteomic.grid(row=14,column=0)
 
+		# Definition of list of cell lines in listbox once tissue has been selected
 		def SpecCellLineUpdate(event):
 			if self.selectTissue_combobox.get() in listCCLE:
 				self.SpecCellLine_entry.configure(state=NORMAL)
@@ -226,33 +217,6 @@ class Interface(Frame):
 				# sorting data 
 				data = sorted(data, key=str.lower)
 				# put new data
-				for cellLine in cellLineCCLEdico[self.selectTissue_combobox.get()]:
-					self.SpecCellLine_list.insert(END,item)
-		
-		def SpecCellLine_keyrelease(event):
-			value = event.widget.get()
-			value = value.strip().lower()
-			self.tissue = self.tissue_list.curselection()
-			if value == '':
-   				data = cellLineCCLEdico[self.selectTissue_combobox.get()]
-   				print(data)
-			else:
-				data = []
-				for item in cellLineCCLEdico[self.selectTissue_combobox.get()]:
-					if value in item.lower():
-						data.append(item)   
-
-		# update data in listbox
-			SpecCellLine_listbox_update(data)
-
-
-		def SpecCellLine_listbox_update(data):
-   		 # delete previous data
-			self.SpecCellLine_list.delete(0, 'end')
-			if data:
-		# sorting data 
-				data = sorted(data, key=str.lower)
-		# put new data
 				for item in data:
 					self.SpecCellLine_list.insert('end', item)
 			else:
@@ -302,30 +266,6 @@ class Interface(Frame):
 
 		self.label_docOverflow=Label(self,text='?',font=("Helvetica"))
 		self.label_docOverflow.grid(row=19, column=1)
-
-		self.SpecCellLine_entry=Entry(self,state=DISABLED,font=("Helvetica"))
-		self.SpecCellLine_entry.grid(row=15,column=2)
-		self.SpecCellLine_entry.bind('<KeyRelease>', SpecCellLine_keyrelease)
-
-		self.SpecCellDefilB = Scrollbar(self, orient='vertical')
-		self.SpecCellDefilB.grid(row=16, column=3, sticky='ns' )
-
-		self.SpecCellLine_list = Listbox(self,font=("Helvetica"),selectmode=SINGLE,yscrollcommand=self.SpecCellDefilB.set,exportselection=0)
-		self.SpecCellLine_list.grid(row=16,column=2)
-		self.SpecCellLine_list.config(width=20,height=2,state=DISABLED)
-
-		self.selectTissue_combobox = ttk.Combobox(self,state=DISABLED,textvariable = self.selected_tissue)
-		self.selectTissue_combobox['values'] = listCCLE
-		self.selectTissue_combobox.bind('<<ComboboxSelected>>', SpecCellLineUpdate)
-		self.selectTissue_combobox.grid(row=14,column=2)
-
-
-		self.add_overflow = Checkbutton(self, variable=self.OverflowOption,text="Add overflow (in % of the shortest path length) :", font=("Helvetica"),command=self.Able_scaleOverflow)
-		self.add_overflow.grid(row=17, column=0)
-
-		self.label_docOverflow=Label(self,text='?',font=("Helvetica", ))
-		self.label_docOverflow.grid(row=17, column=0, sticky='e')
-
 		self.label_docOverflow.bind('<Enter>', lambda event, text='The "overflow option" will display extra networks\n with alternative paths with a percentage of shortest path extra length.': add_Tooltip(self.label_docOverflow,text))
 		self.label_docOverflow.bind('<Leave>', lambda event :destroy_Tooltip(self))
 
@@ -338,23 +278,12 @@ class Interface(Frame):
 
 		self.label_docExtraction=Label(self,text='?',font=("Helvetica", ))
 		self.label_docExtraction.grid(row=20, column=0, sticky='e')
-
-		self.overflow.grid(row=17,column=2)
-
-		#Network extraction
-		self.ExtractionLabel=Label(self,text="Network extraction, enter list of :",font=("Helvetica"))
-		self.ExtractionLabel.grid(row=18,column=0,columnspan=2,pady=5)
-
-		self.label_docExtraction=Label(self,text='?',font=("Helvetica", ))
-		self.label_docExtraction.grid(row=18, column=0, sticky='e')
-
 		self.label_docExtraction.bind('<Enter>', lambda event, text='The "extraction option" will display the sub-networks focusing on a subset of targets. \nThese targets can be selected based on GO term associated categories \nand or a specified subset of targets.': add_Tooltip(self.label_docExtraction,text))
 		self.label_docExtraction.bind('<Leave>', lambda event :destroy_Tooltip(self))
 
 
 
 		self.targets=Checkbutton(self,text="Subset of target(s) :",command=self.Able_target_extraction,variable=self.target_extract_option,font=("Helvetica"))
-
 		self.targets.grid(row=21,column=0)  
 
 		self.target_list_extraction=Entry(self,state=DISABLED,font=("Helvetica"),textvariable=self.subset_targets)
@@ -369,7 +298,6 @@ class Interface(Frame):
 		self.GO_list_extraction=Listbox(self,selectmode=MULTIPLE,font=("Helvetica"),yscrollcommand=self.yDefilCat.set,exportselection=0)
 		self.GO_list_extraction.grid(row=22,column=2)
 
-
 		self.yDefilCat['command'] = self.GO_list_extraction.yview
 		for item in ["cell adhesion and motility","cell growth and death","cell transport and metabolism", "immune system and inflammation","cell differentiation"]:
 			self.GO_list_extraction.insert(END, item)
@@ -378,10 +306,7 @@ class Interface(Frame):
 		
 		#submit button
 		self.submit=Button(self, text="Submit", font=("Helvetica"),command=self.cliquerSubmit,)
-		#
-
 		self.submit.grid(row=23,column=0)
-
 
 	#Function to select file
 	def cliquerFile(self):
@@ -414,7 +339,6 @@ class Interface(Frame):
 	def Able_cellLine(self):
 		if self.addGlobal.get()==1:
 			self.selectTissue_combobox.configure(state=NORMAL)
-
 			self.selectTissue_label.configure(state=NORMAL)
 		else:
 			self.selectTissue_combobox.configure(state=DISABLED)
@@ -430,7 +354,6 @@ class Interface(Frame):
 			self.selected_tissue.get()==""
 			self.Cell_line=[]
 			self.DemoteCCLEOption.get()==0
-
 
 	def Able_scaleOverflow(self):
 		if self.OverflowOption.get()==1:
@@ -457,9 +380,7 @@ class Interface(Frame):
 	def cliquerSubmit(self):
 		self.KinPhos_mod=self.KinPhos_list.curselection()
 		self.CatExtraction=self.GO_list_extraction.curselection()
-
 		self.Cell_line=self.SpecCellLine_list.curselection()
-
 		if self.checkFormular() ==1:
 			fenetre.destroy()
 		else:
@@ -519,26 +440,20 @@ class Interface(Frame):
 
 		if self.addGlobal.get()==1 and self.selected_tissue.get()=="":
 			self.addGlobalProteomic.config(fg='red')
-
 			self.selectTissue_label.config(fg='red')
-
 			self.check=0
 		else:
 			self.addGlobalProteomic.config(fg='black')
 
 		if self.addGlobal.get()==1 and not self.Cell_line:
 			self.addGlobalProteomic.config(fg='red')
-
 			self.SpecCellLine_list_label.config(fg='red')
-
 			self.check=0
 		else:
 			self.addGlobalProteomic.config(fg='black')
 
-
 		if self.addGlobal.get()==1 and self.Cell_line and self.selected_tissue.get()!="":
 			self.cell_line=self.SpecCellLine_list.get(self.Cell_line[0])+"_"+self.selected_tissue.get().upper()
-
 
 		if self.OverflowOption.get()==1 and self.overflowValue.get()==0:
 			self.add_overflow.config(fg='red')
