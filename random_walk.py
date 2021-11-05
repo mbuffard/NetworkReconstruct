@@ -21,7 +21,6 @@ def get_adjacency_matrix(edge_file, nodeList):
             id1Index = nodeList.index(lineList[0].strip())
             id2Index = nodeList.index(lineList[2].strip())
             adjacency[id1Index, id2Index] = lineList[1]
-            adjacency[id2Index, id1Index] = lineList[1]
 
     return(adjacency)
 
