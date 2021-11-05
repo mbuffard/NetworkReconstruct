@@ -4,10 +4,8 @@ import os
 import os.path
 import math
 import converter
-import fisher
+import fisher2
 import networkx as nx
-import time
-
 
 
 def rank(targets, pathways, allmembers, outname):
@@ -18,8 +16,6 @@ def rank(targets, pathways, allmembers, outname):
     
     # score it all
     out = open(outname, 'w')
-    depart = time.time()
-    print(depart)
     for uid,name,members in pathways:
         pmembers = members.intersection(realtargets)
         pmember_names = [ converter.handler.to_symbol(uid) for uid in pmembers ]
@@ -31,7 +27,7 @@ def rank(targets, pathways, allmembers, outname):
             pmembers.remove(None)
         C  = len(members)
         Cn = len(pmembers)
-        score = fisher.pvalue_population(Cn, C, Pn, P).two_tail
+        score = fisher2.pvalue_population(Cn, C, Pn, P).two_tail
         log_score = math.log(score, 10)
         if (float(Cn)/C) < Pr: 
             log_score = -log_score
@@ -39,10 +35,6 @@ def rank(targets, pathways, allmembers, outname):
         out.write("%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (uid,C,Cn,log_score, name, ','.join(pmembers), ','.join(pmember_names)))
         
     out.close()
-    
-    fin = time.time()
-    print(fin)
-    print("--- %s seconds ---" % (fin - depart))
 
 def load_pathways(membersfile):
     f = open(membersfile)
@@ -103,10 +95,12 @@ def merge_ranks(outfolder, targetfiles, outname):
 
 
 #to do add selection mode option
-def build_network(rank_file, network_file_name, targets,cachedir,selection_mode):
+def build_network(rank_file, network_file_name, targets,cachedir,selection_mode,outfolder,filename):
     network_file = "%s.tsv" % network_file_name
     nodes_file = "%s_nodes.tsv" % network_file_name
     ranked = []
+    selected_paths_name=os.path.join(outfolder, "%s__selected_pathways.tsv" % filename)
+    selected_paths=open(selected_paths_name,'w')
     f = open(rank_file)
     for line in f:
         data = line.strip('\n').split('\t')
@@ -129,6 +123,7 @@ def build_network(rank_file, network_file_name, targets,cachedir,selection_mode)
                     continue
             merge_pathway_in_network(net, pid,cachedir)
             covered.update(members)
+            selected_paths.write(pid+"\t"+str(score)+"\n")
         if selection_mode==2:
             merge_pathway_in_network(net, pid,cachedir)
             covered.update(members)

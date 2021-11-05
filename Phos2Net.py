@@ -1,5 +1,5 @@
 from __future__ import print_function
-import fisher
+import fisher2
 import os
 import os.path
 import networkx as nx
@@ -10,9 +10,11 @@ import shutil
 import converter
 import GUI
 from tkinter import *
+from tkinter.messagebox import *
+from tkinter import ttk
 from os.path import basename
 from GUI import interface
-from tkinter import ttk
+import threading
 
 ####################################################################################################################################################################
 # This code is an improvement of the code from Naldi A, Larive RM, Czerwinska U, Urbach S, Montcourrier P, Roy C, et al. (2017), PLoS Comput Biol 13(3)
@@ -23,11 +25,24 @@ from tkinter import ttk
 
 
 if interface.check==0:
-	exit()
+    interface.destroy()
 
 
+ 
 # Set paths and other parameters
 # setup paths and filename
+
+def infowindow(message1,message2):
+	progres = Tk()
+	label=Label(progres,text=message1,font=("Helvetica", 24)   )
+	label.grid(row=0,column=0)
+	label2=Label(progres,text=message2,font=("Helvetica", 24)   )
+	label2.grid(row=1,column=0)
+	progres.mainloop()
+
+
+progreswindow = threading.Thread(target=infowindow, args=("Job in progress : ","Please Wait"),daemon= True)
+progreswindow.start()
 
 work_folder = interface.work_folder
 rpath = os.path.join( 'random_walk')
@@ -86,6 +101,7 @@ if interface.addSpecMod.get()==1:
 		uniprot=converter.handler.clean_uid(uniprot)
 		p_mod.add(uniprot)
 ###################################################################################################
+
 
 
 
@@ -230,8 +246,6 @@ for line in f:
 		targets.add(data[0])
 f.close()
 
-
-
 ############################################# For all targets (all nodes....)###########################################
 # Add the weights and build the graph for path search
 interactions = add_weights('%s.tsv' % network_file_name, ptyr_score)
@@ -250,8 +264,6 @@ Gs = nearshortest.random_walk(reachable, get_rate, source, rpath)
 # Compute shortest paths on network after random walk
 ranks_rdm = nearshortest.rank_paths(Gs, source)
 reachable_rdm = G.subgraph(ranks_rdm)
-
-
 
 ############################################################################################################################
 # Reconstruct shortest paths to specified sets of targets (go associated), targets need to be in a file with the uniprot
@@ -283,16 +295,10 @@ for tfile in os.listdir(target_files_folder):
 
 ############################################################################################################################
 
-
 fenetre = Tk()
-
 label=Label(fenetre,text="Job done, networks have been created in :",font=("Helvetica", 24)   )
 label.grid(row=0,column=0)
-
 label2=Label(fenetre,text=interface.work_folder,font=("Helvetica", 24)   )
 label2.grid(row=1,column=0)
 
-
 fenetre.mainloop()
-
-

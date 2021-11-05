@@ -1,4 +1,4 @@
-from __future__ import print_function
+# from __future__ import print_function
 
 import os
 import sys
@@ -7,7 +7,7 @@ import networkx as nx
 import converter
 import subprocess
 from random_walk import run_random_walk_with_restart
-import time
+# import time
 
 
 ############################### Creating the graph ############################
@@ -110,9 +110,9 @@ def save_graph(G, filename):
 
 def random_walk(G, helper, source, rpath):
     "Refine the weights of all arcs after running a random walk (external R code)"
-    debut = time.time()
-    print('Debut Random Walk :')
-    print(debut)
+    # debut = time.time()
+    # print('Debut Random Walk :')
+    # print(debut)
     filename = os.path.join(rpath,'network')
     f_nodes = '%s_nodes.tsv' % filename
     f_wedges = '%s_wedges.tsv' % filename
@@ -158,11 +158,11 @@ def random_walk(G, helper, source, rpath):
     Gs = nx.DiGraph()
     Gs.add_weighted_edges_from(scaled_arcs)
     
-    fin = time.time()
-    print('Fin Random Walk :')
-    print(fin)
-    print('Duree Random Walk (en s) :')
-    print(fin - debut)
+    # fin = time.time()
+    # print('Fin Random Walk :')
+    # print(fin)
+    # print('Duree Random Walk (en s) :')
+    # print(fin - debut)
     
     return Gs
     
